@@ -2,7 +2,7 @@
 
 **Sub-project 1 of 4** | Date: 2026-04-16
 
-Future sub-projects: WhatsApp integration, LinkedIn scraping/posting + scheduling, Payments (Stripe).
+Future sub-projects (in order): **WhatsApp integration** (primary differentiator — send a voice note or text via WhatsApp, get a LinkedIn post back), LinkedIn scraping/posting + scheduling, Payments (Stripe).
 
 ---
 
@@ -14,7 +14,7 @@ A LinkedIn post generator that produces posts indistinguishable from what the us
 
 **Languages:** German and English. Auto-detect from input with manual override per post.
 
-**Monetization:** Freemium — 10 free posts/month (refinements unlimited), Pro at ~€29/month for unlimited generation.
+**Monetization:** Freemium — 5 free posts/month (refinements unlimited), Pro at ~€29/month for unlimited generation.
 
 ---
 
@@ -247,11 +247,12 @@ Then → Dashboard, ready to generate first post.
 1. **Hero** — Problem-first headline: "LinkedIn-Posts, die sich anfühlen, als hättest du sie selbst geschrieben" / "LinkedIn posts that sound like you actually wrote them." Primary CTA: "Kostenlos starten" / "Start for free"
 2. **Pain points** — 3 cards: Generic AI output / No time to write / Inconsistent posting → how we solve each
 3. **How it works** — 3-step visual: Enter idea → AI writes in your voice → Copy & post
-4. **Post preview** — Show a real-looking generated post in LinkedIn-style UI (competitors hide this — we show it)
-5. **Writing DNA section** — Explain personalization: "We learn how YOU write"
-6. **Pricing** — Side-by-side Free vs Pro with CTAs on both
-7. **FAQ** — "Is this just ChatGPT?" / "Will it sound like me?" / "Can I use it in German?"
-8. **Final CTA** — Repeat primary action
+4. **WhatsApp teaser** — "Coming soon: Send a voice note via WhatsApp, get a LinkedIn post back." Eye-catching section with WhatsApp icon and early-access signup. This is the #1 differentiator — no competitor offers this. Prominently featured to build anticipation and collect interested leads.
+5. **Post preview** — Show a real-looking generated post in LinkedIn-style UI (competitors hide this — we show it)
+6. **Writing DNA section** — Explain personalization: "We learn how YOU write"
+7. **Pricing** — Side-by-side Free vs Pro with CTAs on both
+8. **FAQ** — "Is this just ChatGPT?" / "Will it sound like me?" / "Can I use it in German?" / "What about WhatsApp?"
+9. **Final CTA** — Repeat primary action
 
 ### SEO strategy
 - **Primary keywords:** "LinkedIn Post Generator", "LinkedIn Post erstellen", "KI LinkedIn Posts", "LinkedIn Beitrag schreiben"
@@ -277,7 +278,7 @@ All UI is designed mobile-first, then adapted for desktop.
 
 ## 10. Freemium Gating
 
-- **Free tier:** 10 new post generations per month, unlimited refinements, full Writing DNA access
+- **Free tier:** 5 new post generations per month, unlimited refinements, full Writing DNA access
 - **Pro tier (~€29/mo):** Unlimited generations, priority generation speed
 - **Counter:** postsUsedThisMonth on User model, checked before each generation
 - **Reset:** Monthly reset via check-on-request (compare current month vs last generation date)
@@ -304,7 +305,7 @@ All UI is designed mobile-first, then adapted for desktop.
 - Our refinement system gives more control than picking from 3 options
 
 ### Our unique advantages
-1. WhatsApp integration (future sub-project — no competitor has this)
+1. **WhatsApp integration** (coming in sub-project 2 — the primary differentiator, no competitor has this. Teased on landing page from day one to build anticipation and collect early-access leads)
 2. Style Discovery for LinkedIn beginners
 3. Transparent Writing DNA the user can see and adjust
 4. Multi-step AI chain with self-evaluation
