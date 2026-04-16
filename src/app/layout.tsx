@@ -14,9 +14,39 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "NoPersonAI — LinkedIn Posts That Sound Like You",
+  title: {
+    default: "NoPersonAI — LinkedIn Posts That Sound Like You",
+    template: "%s | NoPersonAI",
+  },
   description:
-    "Generate authentic LinkedIn posts with AI that learns your writing style. No generic content. Your voice, amplified.",
+    "Generate authentic LinkedIn posts with AI that learns your writing style. No generic content. Your voice, amplified. Free to start.",
+  keywords: [
+    "LinkedIn Post Generator",
+    "LinkedIn Post erstellen",
+    "KI LinkedIn Posts",
+    "LinkedIn Beitrag schreiben",
+    "AI LinkedIn writer",
+    "LinkedIn content creator",
+  ],
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    alternateLocale: "de_DE",
+    siteName: "NoPersonAI",
+    title: "NoPersonAI — LinkedIn Posts That Sound Like You",
+    description:
+      "AI that learns your voice, not just your topics. Generate authentic LinkedIn posts in seconds.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "NoPersonAI — LinkedIn Posts That Sound Like You",
+    description:
+      "AI that learns your voice, not just your topics. Generate authentic LinkedIn posts in seconds.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
