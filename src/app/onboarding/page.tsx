@@ -110,8 +110,18 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 px-4 py-8">
-      <div className="mx-auto max-w-sm space-y-8">
+    <div className="min-h-screen bg-zinc-50 px-4 py-8">
+      <div className="mx-auto max-w-md space-y-8">
+        <div className="text-center">
+          <div className="inline-flex items-center gap-2">
+            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 text-center text-sm font-bold leading-8 text-white">
+              N
+            </div>
+            <span className="font-display text-base font-bold tracking-tight text-zinc-900">
+              NoPerson<span className="text-brand-600">AI</span>
+            </span>
+          </div>
+        </div>
         <ProgressBar currentStep={step} totalSteps={4} />
 
         {step === 1 && (

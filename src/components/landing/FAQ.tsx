@@ -1,73 +1,85 @@
 "use client";
 
 import { useState } from "react";
+import { Plus, Minus } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const faqs = [
   {
-    q: "Is this just ChatGPT with a wrapper?",
-    a: "No. We use a proprietary 5-step AI chain that analyzes your intent, selects the optimal structure, writes in your voice, and self-evaluates before delivering. Generic AI tools give you generic output. We give you YOUR voice.",
+    q: "How is this different from ChatGPT?",
+    a: "ChatGPT produces generic output. NoPersonAI trains a Writing DNA profile from your own posts and stylistic preferences, then runs a 5-step generation chain that grades every draft for how human it sounds, how well it matches your voice, and how native it feels on LinkedIn. You get drafts you'd actually post.",
   },
   {
-    q: "Will the posts really sound like me?",
-    a: "Yes. Our Writing DNA system learns your tone, sentence patterns, emoji usage, and storytelling style from your past posts or through a guided discovery process. The more you use it, the better it gets.",
+    q: "How does the WhatsApp integration work?",
+    a: "Once you're on Pro, connect your phone number inside the app. Send a text message or a voice note to the NoPersonAI WhatsApp number and you'll receive a ready-to-post LinkedIn draft in under 30 seconds — in your voice, in your language. German and English are auto-detected.",
   },
   {
-    q: "Can I use it in German?",
-    a: "Absolutely. NoPersonAI works in both German and English. It auto-detects your input language and generates in the same language. You can also override per post.",
+    q: "Is my voice data stored?",
+    a: "We transcribe voice notes with industry-standard speech-to-text (OpenAI Whisper), then discard the audio. Only the transcribed text is saved alongside the generated post in your history. You can delete any post (and its source) from your history at any time.",
   },
   {
-    q: "What about WhatsApp?",
-    a: "Our WhatsApp integration is coming soon. You'll be able to send a voice note or text message via WhatsApp and receive a ready-to-post LinkedIn post back. Sign up for early access above.",
+    q: "What about German (Deutsch)?",
+    a: "Full native support. Our AI chain detects the language of your input automatically and writes in that language. You can also set your preferred default in Writing DNA settings.",
   },
   {
-    q: "Is my data safe?",
-    a: "Your posts and writing profile are stored securely and never shared. We don't use your content to train AI models. You can delete your account and all data at any time.",
+    q: "Can LinkedIn detect AI-generated posts?",
+    a: "LinkedIn does not penalize AI-assisted writing. But their audiences do penalize obviously generic content. That's the problem NoPersonAI solves — drafts that read like you, not like a template.",
+  },
+  {
+    q: "Is there a free plan?",
+    a: "Yes. Free forever, 5 posts per month, Writing DNA included. No credit card required.",
+  },
+  {
+    q: "GDPR / data handling",
+    a: "Data is stored on EU-hosted PostgreSQL (Neon). You can export or delete your account and all associated data at any time from the account page.",
   },
 ];
 
 export default function FAQ() {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <section className="px-4 py-16">
-      <div className="mx-auto max-w-lg">
-        <h2 className="text-center text-2xl font-bold text-gray-900">FAQ</h2>
-        <div className="mt-8 space-y-2">
-          {faqs.map((faq, i) => (
-            <div
-              key={i}
-              className="rounded-xl border border-gray-200 bg-white"
-            >
-              <button
-                onClick={() => setOpenIndex(openIndex === i ? null : i)}
-                className="flex w-full items-center justify-between px-4 py-3 text-left"
-              >
-                <span className="text-sm font-medium text-gray-900">
-                  {faq.q}
-                </span>
-                <svg
-                  className={`h-4 w-4 shrink-0 text-gray-500 transition-transform ${
-                    openIndex === i ? "rotate-180" : ""
-                  }`}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                  stroke="currentColor"
+    <section id="faq" className="bg-white scroll-mt-20">
+      <div className="mx-auto max-w-3xl px-4 py-14 md:px-6 md:py-24">
+        <div className="text-center">
+          <p className="font-display text-sm font-semibold uppercase tracking-wider text-brand-600">
+            FAQ
+          </p>
+          <h2 className="mt-2 font-display text-2xl font-bold tracking-tight text-zinc-900 md:text-4xl">
+            Questions, answered.
+          </h2>
+        </div>
+
+        <div className="mt-10 divide-y divide-zinc-100 rounded-3xl border border-zinc-200 bg-white">
+          {faqs.map((faq, i) => {
+            const isOpen = open === i;
+            return (
+              <div key={i}>
+                <button
+                  type="button"
+                  onClick={() => setOpen(isOpen ? null : i)}
+                  className="flex w-full items-center justify-between gap-4 px-5 py-5 text-left transition-colors hover:bg-zinc-50"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-                  />
-                </svg>
-              </button>
-              {openIndex === i && (
-                <div className="px-4 pb-3">
-                  <p className="text-sm text-gray-600">{faq.a}</p>
-                </div>
-              )}
-            </div>
-          ))}
+                  <span className="font-display text-base font-semibold text-zinc-900 md:text-lg">
+                    {faq.q}
+                  </span>
+                  <span
+                    className={cn(
+                      "inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full border",
+                      isOpen
+                        ? "border-brand-200 bg-brand-50 text-brand-600"
+                        : "border-zinc-200 text-zinc-500",
+                    )}
+                  >
+                    {isOpen ? <Minus className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
+                  </span>
+                </button>
+                {isOpen && (
+                  <div className="px-5 pb-5 text-sm leading-relaxed text-zinc-600">{faq.a}</div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>

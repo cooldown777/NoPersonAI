@@ -1,6 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Send, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/Button";
+import VoiceRecorder from "./VoiceRecorder";
 
 const placeholders = [
   "I just closed my first 6-figure deal...",
@@ -16,6 +19,7 @@ interface IdeaInputProps {
   onGenerate: () => void;
   isGenerating: boolean;
   disabled: boolean;
+  isPro: boolean;
 }
 
 export default function IdeaInput({
@@ -24,47 +28,56 @@ export default function IdeaInput({
   onGenerate,
   isGenerating,
   disabled,
+  isPro,
 }: IdeaInputProps) {
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
       setPlaceholderIndex((i) => (i + 1) % placeholders.length);
-    }, 3000);
+    }, 3500);
     return () => clearInterval(interval);
   }, []);
 
   function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === "Enter" && !e.shiftKey && value.trim()) {
+    if (e.key === "Enter" && (e.metaKey || e.ctrlKey) && value.trim()) {
       e.preventDefault();
       onGenerate();
     }
   }
 
   return (
-    <div className="space-y-3">
+    <div className="rounded-3xl border border-zinc-200 bg-white shadow-sm">
       <textarea
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder={placeholders[placeholderIndex]}
-        rows={3}
-        className="w-full resize-none rounded-xl border border-gray-300 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+        rows={4}
+        className="block w-full resize-none rounded-t-3xl bg-transparent px-5 py-4 text-base text-zinc-900 placeholder:text-zinc-400 focus:outline-none"
       />
-      <button
-        onClick={onGenerate}
-        disabled={!value.trim() || isGenerating || disabled}
-        className="w-full rounded-xl bg-blue-600 px-4 py-3.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
-      >
-        {isGenerating ? (
-          <span className="flex items-center justify-center gap-2">
-            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-            Generating...
-          </span>
-        ) : (
-          "Generate post"
-        )}
-      </button>
+      <div className="flex items-center gap-3 border-t border-zinc-100 p-3">
+        <VoiceRecorder
+          isPro={isPro}
+          onTranscribed={(text) =>
+            onChange(value ? `${value.trim()}\n\n${text}` : text)
+          }
+        />
+        <div className="flex-1 text-xs text-zinc-400">
+          <span className="hidden sm:inline">⌘+Enter to generate · </span>
+          {value.length} chars
+        </div>
+        <Button
+          size="md"
+          onClick={onGenerate}
+          disabled={!value.trim() || isGenerating || disabled}
+          loading={isGenerating}
+          rightIcon={!isGenerating && <Send className="h-4 w-4" />}
+          leftIcon={!isGenerating && <Sparkles className="h-4 w-4" />}
+        >
+          Generate
+        </Button>
+      </div>
     </div>
   );
 }

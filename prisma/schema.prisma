@@ -63,6 +63,25 @@ enum RefinementType {
   custom
 }
 
+enum WhatsAppStatus {
+  pending
+  verified
+  revoked
+}
+
+enum MessageDirection {
+  inbound
+  outbound
+}
+
+enum MessageStatus {
+  received
+  transcribing
+  generating
+  sent
+  failed
+}
+
 // NextAuth required tables
 model Account {
   id                String  @id @default(cuid())
@@ -105,16 +124,18 @@ model User {
   emailVerified      DateTime?
   name               String?
   image              String?
+  phoneE164          String?   @unique
   plan               Plan      @default(free)
   postsUsedThisMonth Int       @default(0)
   postsResetAt       DateTime  @default(now())
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
 
-  accounts   Account[]
-  sessions   Session[]
-  writingDna WritingDNA?
-  posts      Post[]
+  accounts            Account[]
+  sessions            Session[]
+  writingDna          WritingDNA?
+  posts               Post[]
+  whatsAppConnection  WhatsAppConnection?
 }
 
 model WritingDNA {
@@ -147,8 +168,42 @@ model Post {
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 
-  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  refinements Refinement[]
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refinements      Refinement[]
+  incomingMessages IncomingMessage[]
+}
+
+model WhatsAppConnection {
+  id               String           @id @default(cuid())
+  userId           String           @unique
+  phoneE164        String           @unique
+  status           WhatsAppStatus   @default(pending)
+  verificationCode String?
+  verifiedAt       DateTime?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  user     User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages IncomingMessage[]
+}
+
+model IncomingMessage {
+  id                 String           @id @default(cuid())
+  connectionId       String
+  providerMessageId  String           @unique
+  direction          MessageDirection
+  bodyText           String?
+  mediaUrl           String?
+  transcription      String?
+  generatedPostId    String?
+  status             MessageStatus    @default(received)
+  errorReason        String?
+  createdAt          DateTime         @default(now())
+
+  connection    WhatsAppConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  generatedPost Post?              @relation(fields: [generatedPostId], references: [id], onDelete: SetNull)
+
+  @@index([connectionId, createdAt])
 }
 
 model Refinement {

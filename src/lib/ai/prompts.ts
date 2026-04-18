@@ -2,7 +2,7 @@ import { WritingDNAInput } from "./types";
 
 export function buildIntentAndStructurePrompt(
   userInput: string,
-  dnaProfile: string
+  dnaProfile: string,
 ): string {
   return `You are analyzing a LinkedIn post idea to determine intent and best structure.
 
@@ -12,8 +12,9 @@ USER'S IDEA:
 USER'S WRITING PROFILE:
 ${dnaProfile}
 
-Respond in JSON only. No markdown, no explanation.
+Respond with a JSON object only — no markdown fences, no prose, no explanation.
 
+Shape:
 {
   "intent": {
     "topic": "the core topic in 3-5 words",
@@ -35,55 +36,63 @@ export function buildGeneratePostPrompt(
   structure: string,
   structureReasoning: string,
   dna: WritingDNAInput,
-  language: string
+  language: string,
 ): string {
   const structureGuides: Record<string, string> = {
     hook_story:
-      "Start with a bold hook (1 line). Tell a short story (3-5 lines). Draw an insight (2-3 lines). End with a clear CTA.",
+      "Open with a one-line hook that makes the reader stop scrolling. Tell a short true-feeling story in 3-5 short lines. Widen to an insight. End with a quiet, reusable one-line takeaway — not a rhetorical question.",
     contrarian:
-      "Open with a contrarian statement that challenges common belief. Support with evidence or experience. End with your actual position.",
+      "Open with a claim that challenges the default belief on this topic. Do not be edgy for its own sake — be specific. Support with lived experience or a concrete example. End with the nuance you actually hold.",
     personal:
-      "Start vulnerable — share a real moment. Build the narrative. End with what you learned. Make the reader feel it.",
-    list: "Hook with what the list delivers. Number each item (keep them punchy). End with a takeaway or CTA.",
+      "Begin with a concrete moment (time, place, what you saw). Narrate plainly. Let the reader feel the stakes. End with what you took from it — not what they should do.",
+    list:
+      "Hook with what the list delivers or pays off. Number 3-5 items, each a complete thought in 1-2 sentences. Close with a single sentence that ties them together.",
     lesson:
-      "Start with the failure or mistake. What happened. What you learned. What the reader can do differently.",
+      "Lead with the mistake or failure in 1 line. What actually happened (2-3 lines). What you learned (1-2 lines). Make the lesson transferable without sounding preachy.",
   };
 
-  return `You are a LinkedIn ghostwriter. Write a post that sounds EXACTLY like this person wrote it.
+  return `You are a LinkedIn ghostwriter. Write a post that sounds EXACTLY like this person wrote it — not like an AI, not like a template, not like every other LinkedIn post.
 
-VOICE INSTRUCTIONS (follow these precisely):
+VOICE (follow precisely):
 ${dna.generatedProfile}
 
-STYLE RULES:
+HARD STYLE RULES:
 - Tone: ${dna.tone}
 - Sentence style: ${dna.style}
-- Emoji usage: ${dna.emojiUsage}
-- Language: Write in ${language === "de" ? "German" : "English"}
+- Emoji usage: ${dna.emojiUsage} (if "none", use zero emojis — not even in bullets)
+- Language: Write in ${language === "de" ? "German (Deutsch)" : "English"}
 
-LINKEDIN FORMATTING RULES:
-- First line must be a hook — it appears before "see more" (max 210 characters)
-- Use short lines (1-2 sentences per line)
-- Add blank lines between sections for readability
-- No hashtags in the body — add 3-5 relevant hashtags at the very end after a blank line
-- Keep total length between 800-1500 characters
+THINGS THAT MAKE POSTS READ AS AI (avoid all of these):
+- Rhetorical questions like "Agree?", "What do you think?", "Sound familiar?"
+- Decorative emoji lists (✅ 🚀 💡)
+- Three-item lists where every item is exactly one line
+- Phrases like "Let me share", "Here are", "key lessons I've learned"
+- Closing with 5+ hashtags and a question
+- Fortune-cookie wisdom in the final line
 
-STRUCTURE: ${structure}
+LINKEDIN FORMATTING:
+- First line must be a hook under 210 characters — what shows before "see more".
+- Break paragraphs with a blank line. Short paragraphs.
+- No hashtags in the body. Add 3-5 specific hashtags at the very end only if the voice profile suggests hashtags are normal for this author; otherwise zero hashtags.
+- Total length: 700-1500 characters.
+
+STRUCTURE: ${structure} — ${structureReasoning}
 ${structureGuides[structure] || structureGuides.hook_story}
 
 USER'S ORIGINAL IDEA:
 "${userInput}"
 
-INTENT: ${intent}
+INTENT JSON: ${intent}
 
-${dna.samplePosts.length > 0 ? `EXAMPLE POSTS BY THIS USER (mimic this style):\n${dna.samplePosts.map((p, i) => `--- Example ${i + 1} ---\n${p}`).join("\n\n")}` : ""}
+${dna.samplePosts.length > 0 ? `EXAMPLES OF HOW THIS USER ACTUALLY WRITES (mimic this rhythm):\n${dna.samplePosts.slice(0, 3).map((p, i) => `--- Example ${i + 1} ---\n${p}`).join("\n\n")}` : ""}
 
-Write the LinkedIn post now. Output ONLY the post text, nothing else.`;
+Output ONLY the post text. No preamble, no explanation, no quotation marks wrapping the post.`;
 }
 
 export function buildSelfEvaluatePrompt(
   post: string,
   userInput: string,
-  dnaProfile: string
+  dnaProfile: string,
 ): string {
   return `Evaluate this LinkedIn post on 4 criteria. Score each 1-5.
 
@@ -97,7 +106,9 @@ ORIGINAL IDEA: "${userInput}"
 AUTHOR'S WRITING PROFILE:
 ${dnaProfile}
 
-Score in JSON only:
+Be strict. A score of 3 means "acceptable but generic." 5 means "I believe a real human wrote this."
+
+Respond with JSON only. No markdown. Shape:
 {
   "soundsHuman": 1-5,
   "matchesVoice": 1-5,
@@ -112,46 +123,46 @@ export function buildRefinementPrompt(
   action: string,
   customInstruction: string | null,
   dna: WritingDNAInput,
-  language: string
+  language: string,
 ): string {
   const actionInstructions: Record<string, string> = {
     stronger_hook:
-      "Rewrite ONLY the first 1-2 lines with a more compelling, attention-grabbing hook. Keep the rest unchanged.",
+      "Rewrite ONLY the first 1-2 lines with a more compelling, scroll-stopping hook. Keep everything after unchanged.",
     different_cta:
-      "Rewrite ONLY the call-to-action at the end. Keep the rest unchanged.",
+      "Rewrite ONLY the closing line / call-to-action. Keep the rest unchanged.",
     change_takeaway:
-      "Change the core lesson or insight of the post while keeping the story/structure.",
+      "Change the core lesson or insight while keeping the story and structure.",
     shorter:
-      "Condense this post significantly. Remove filler, tighten sentences. Keep the core message.",
+      "Tighten the post significantly. Remove filler, combine lines, cut anything not load-bearing. Keep the core message and voice.",
     longer:
-      "Expand this post with more detail, examples, or story. Keep the same structure.",
+      "Expand with one more concrete detail, example, or micro-story. Keep the same structure.",
     more_casual:
-      "Rewrite with a more casual, conversational tone. Like talking to a friend.",
+      "Rewrite with a more casual, conversational register. Shorter words. Contractions. Like talking to a friend.",
     more_professional:
-      "Rewrite with a more polished, professional tone. Keep it warm but authoritative.",
+      "Rewrite with a more polished, precise register. Warm but authoritative. No slang.",
     add_emojis:
-      "Add emojis that fit naturally. Use them to emphasize key points, not decorate.",
-    remove_emojis: "Remove all emojis from the post.",
+      "Add emojis that fit the author's voice — to emphasize, never to decorate. Max 4.",
+    remove_emojis: "Remove all emojis.",
     different_angle:
       "Keep the same topic but approach it from a completely different angle or perspective.",
-    custom: customInstruction || "Improve this post.",
+    custom: customInstruction || "Improve this post while keeping the voice intact.",
   };
 
-  return `You are refining a LinkedIn post. Apply this specific change:
+  return `You are refining a LinkedIn post. Apply exactly this change, nothing more:
 
-CHANGE REQUESTED: ${actionInstructions[action] || actionInstructions.custom}
+CHANGE: ${actionInstructions[action] || actionInstructions.custom}
 
 CURRENT POST:
 """
 ${currentPost}
 """
 
-VOICE INSTRUCTIONS:
+VOICE (preserve this at all costs):
 ${dna.generatedProfile}
-Tone: ${dna.tone} | Style: ${dna.style} | Emojis: ${dna.emojiUsage}
+Tone: ${dna.tone} · Style: ${dna.style} · Emojis: ${dna.emojiUsage}
 Language: ${language === "de" ? "German" : "English"}
 
-Output ONLY the refined post text, nothing else.`;
+Output ONLY the refined post. No preamble, no quotes wrapping it.`;
 }
 
 export function buildDNAProfilePrompt(
@@ -161,31 +172,31 @@ export function buildDNAProfilePrompt(
   emojiUsage: string,
   samplePosts: string[],
   styleDiscoveryAnswers: Record<string, unknown> | null,
-  language: string
+  language: string,
 ): string {
   let styleContext = "";
   if (samplePosts.length > 0) {
     styleContext = `\nSAMPLE POSTS BY THIS USER:\n${samplePosts.map((p, i) => `--- Post ${i + 1} ---\n${p}`).join("\n\n")}`;
   }
   if (styleDiscoveryAnswers) {
-    styleContext += `\nSTYLE DISCOVERY ANSWERS:\n${JSON.stringify(styleDiscoveryAnswers, null, 2)}`;
+    styleContext += `\n\nSTYLE DISCOVERY ANSWERS:\n${JSON.stringify(styleDiscoveryAnswers, null, 2)}`;
   }
 
-  return `Analyze this person's writing style and create a Writing DNA profile. This profile will be used as instructions for an AI ghostwriter to mimic their voice perfectly.
+  return `Analyze this person's writing style and create a Writing DNA profile. This profile will be loaded as system context for every future post our AI writes for them, so it must be precise, concrete, and behavioral — not generic.
 
-QUESTIONNAIRE ANSWERS:
-- Tone: ${tone}
+INPUTS:
+- Self-described tone: ${tone}
 - Target audience: ${audience}
 - Writing style preference: ${style}
 - Emoji usage preference: ${emojiUsage}
 ${styleContext}
 
-Write a 3-5 sentence profile in ${language === "de" ? "German" : "English"} that captures:
-1. How they structure sentences (short/long, fragments/complete)
-2. Their personality in writing (warm/sharp, humble/bold)
-3. Patterns in how they open and close posts
-4. Vocabulary level and formality
-5. Any unique quirks or signatures
+Write a 3-5 sentence profile in ${language === "de" ? "German" : "English"} that captures, with specifics:
+1. Sentence rhythm (short/long, fragments/complete, declarative/reflective)
+2. Personality cues (warm vs sharp, humble vs bold, dry vs playful)
+3. How they open and close — specific verbs or moves they use
+4. Vocabulary register (technical? plain? literary?) — give concrete word-choices they favor or avoid
+5. Any signature quirks (asides, one-word lines, specific punctuation habits)
 
-Output ONLY the profile text. Write it as instructions to a ghostwriter: "This person writes..."`;
+Output ONLY the profile text. Write in second-person-as-instruction: "This person writes…". Do not use bullet points. Do not hedge ("might", "sometimes"); be decisive.`;
 }

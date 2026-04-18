@@ -1,8 +1,14 @@
-import { NextAuthOptions } from "next-auth";
+import type { NextAuthOptions } from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import GoogleProvider from "next-auth/providers/google";
 import EmailProvider from "next-auth/providers/email";
+import { createTransport } from "nodemailer";
 import { prisma } from "@/lib/db";
+import { magicLinkEmail } from "@/lib/email/templates";
+
+// Expected Google Cloud Console redirect URI:
+//   ${NEXTAUTH_URL}/api/auth/callback/google
+// Set in: Google Cloud Console → APIs & Services → Credentials → OAuth 2.0 Client IDs → Authorized redirect URIs
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as NextAuthOptions["adapter"],
@@ -10,6 +16,14 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          prompt: "consent",
+          access_type: "offline",
+          response_type: "code",
+        },
+      },
+      allowDangerousEmailAccountLinking: true,
     }),
     EmailProvider({
       server: {
@@ -21,13 +35,30 @@ export const authOptions: NextAuthOptions = {
         },
       },
       from: process.env.EMAIL_FROM,
+      maxAge: 24 * 60 * 60,
+      async sendVerificationRequest({ identifier, url, provider }) {
+        const { host } = new URL(url);
+        const { subject, html, text } = magicLinkEmail({ url, host });
+        const transport = createTransport(provider.server);
+        const result = await transport.sendMail({
+          to: identifier,
+          from: provider.from,
+          subject,
+          text,
+          html,
+        });
+        const failed = result.rejected.concat(result.pending).filter(Boolean);
+        if (failed.length) {
+          throw new Error(`Email could not be sent to ${failed.join(", ")}`);
+        }
+      },
     }),
   ],
-  session: {
-    strategy: "database",
-  },
+  session: { strategy: "database" },
   pages: {
     signIn: "/auth/signin",
+    verifyRequest: "/auth/verify-request",
+    error: "/auth/error",
   },
   callbacks: {
     async session({ session, user }) {

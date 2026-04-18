@@ -4,6 +4,7 @@ import {
   buildGeneratePostPrompt,
   buildSelfEvaluatePrompt,
 } from "./prompts";
+import { MODELS, type ModelId } from "./models";
 import type {
   IntentAndStructure,
   SelfEvaluation,
@@ -14,11 +15,33 @@ import type {
 
 const anthropic = new Anthropic();
 
-async function callClaude(prompt: string, maxTokens: number): Promise<string> {
+interface CallOptions {
+  model?: ModelId;
+  maxTokens: number;
+  system?: string;
+  cachedPrefix?: string;
+}
+
+async function callClaude(prompt: string, opts: CallOptions): Promise<string> {
+  const { model = MODELS.chain, maxTokens, system, cachedPrefix } = opts;
+
+  const messages: Anthropic.MessageParam[] = cachedPrefix
+    ? [
+        {
+          role: "user",
+          content: [
+            { type: "text", text: cachedPrefix, cache_control: { type: "ephemeral" } },
+            { type: "text", text: prompt },
+          ],
+        },
+      ]
+    : [{ role: "user", content: prompt }];
+
   const response = await anthropic.messages.create({
-    model: "claude-sonnet-4-20250514",
+    model,
     max_tokens: maxTokens,
-    messages: [{ role: "user", content: prompt }],
+    ...(system ? { system } : {}),
+    messages,
   });
 
   const textBlock = response.content.find((block) => block.type === "text");
@@ -35,17 +58,21 @@ function parseJSON<T>(text: string): T {
 
 async function analyzeIntentAndStructure(
   userInput: string,
-  dnaProfile: string
+  dnaProfile: string,
 ): Promise<IntentAndStructure> {
   const prompt = buildIntentAndStructurePrompt(userInput, dnaProfile);
-  const response = await callClaude(prompt, 500);
+  const response = await callClaude(prompt, {
+    maxTokens: 500,
+    cachedPrefix: dnaProfile ? `WRITING PROFILE (cached):\n${dnaProfile}` : undefined,
+  });
   return parseJSON<IntentAndStructure>(response);
 }
 
 async function generatePostText(
   userInput: string,
   intentAndStructure: IntentAndStructure,
-  dna: WritingDNAInput
+  dna: WritingDNAInput,
+  model: ModelId = MODELS.chain,
 ): Promise<string> {
   const language =
     intentAndStructure.intent.detectedLanguage || dna.preferredLanguage;
@@ -55,29 +82,35 @@ async function generatePostText(
     intentAndStructure.structure.structure,
     intentAndStructure.structure.reasoning,
     dna,
-    language
+    language,
   );
-  return callClaude(prompt, 1000);
+  return callClaude(prompt, {
+    model,
+    maxTokens: 1000,
+    cachedPrefix: dna.generatedProfile
+      ? `WRITING PROFILE (cached):\n${dna.generatedProfile}\n\nSample posts cache:\n${dna.samplePosts.slice(0, 3).join("\n\n")}`
+      : undefined,
+  });
 }
 
 async function selfEvaluate(
   post: string,
   userInput: string,
-  dnaProfile: string
+  dnaProfile: string,
 ): Promise<SelfEvaluation> {
   const prompt = buildSelfEvaluatePrompt(post, userInput, dnaProfile);
-  const response = await callClaude(prompt, 200);
+  const response = await callClaude(prompt, { maxTokens: 200 });
   return parseJSON<SelfEvaluation>(response);
 }
 
 export async function generatePost(
   userInput: string,
   dna: WritingDNAInput,
-  maxRetries: number = 1
+  maxRetries: number = 1,
 ): Promise<GenerationResult> {
   const intentAndStructure = await analyzeIntentAndStructure(
     userInput,
-    dna.generatedProfile
+    dna.generatedProfile,
   );
 
   let post: string;
@@ -85,7 +118,9 @@ export async function generatePost(
   let attempt = 0;
 
   do {
-    post = await generatePostText(userInput, intentAndStructure, dna);
+    // Retry with polish model for quality on second attempt
+    const modelForAttempt = attempt === 0 ? MODELS.chain : MODELS.polish;
+    post = await generatePostText(userInput, intentAndStructure, dna, modelForAttempt);
     evaluation = await selfEvaluate(post, userInput, dna.generatedProfile);
     attempt++;
   } while (evaluation.needsRefinement && attempt <= maxRetries);
@@ -100,7 +135,7 @@ export async function generatePost(
 
 export function buildChainContext(
   result: GenerationResult,
-  dna: WritingDNAInput
+  dna: WritingDNAInput,
 ): ChainContext {
   return {
     intent: result.intent,

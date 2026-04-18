@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { Plus, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
 
 interface CustomInstructionProps {
   onSubmit: (instruction: string) => void;
@@ -25,30 +28,33 @@ export default function CustomInstruction({
     return (
       <button
         onClick={() => setExpanded(true)}
-        className="text-xs text-blue-600 hover:text-blue-700"
+        className="inline-flex items-center gap-1 text-xs font-medium text-brand-600 hover:text-brand-700"
       >
-        Custom instruction...
+        <Plus className="h-3.5 w-3.5" />
+        Custom refinement
       </button>
     );
   }
 
   return (
-    <div className="flex gap-2">
-      <input
-        type="text"
+    <div className="flex items-center gap-2">
+      <Input
         value={instruction}
         onChange={(e) => setInstruction(e.target.value)}
         onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
         placeholder="Tell the AI what to change..."
-        className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-xs focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+        autoFocus
+        className="h-10"
       />
-      <button
+      <Button
+        size="md"
         onClick={handleSubmit}
         disabled={!instruction.trim() || isRefining}
-        className="shrink-0 rounded-lg bg-blue-600 px-3 py-2 text-xs font-medium text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
+        loading={isRefining}
+        rightIcon={!isRefining && <ArrowRight className="h-3.5 w-3.5" />}
       >
         Apply
-      </button>
+      </Button>
     </div>
   );
 }

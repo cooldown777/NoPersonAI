@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { buildDNAProfilePrompt } from "./prompts";
+import { MODELS } from "./models";
 
 const anthropic = new Anthropic();
 
@@ -14,7 +15,7 @@ interface GenerateDNAInput {
 }
 
 export async function generateDNAProfile(
-  input: GenerateDNAInput
+  input: GenerateDNAInput,
 ): Promise<string> {
   const prompt = buildDNAProfilePrompt(
     input.tone,
@@ -23,11 +24,12 @@ export async function generateDNAProfile(
     input.emojiUsage,
     input.samplePosts,
     input.styleDiscoveryAnswers,
-    input.language
+    input.language,
   );
 
+  // Use the polish model — DNA is quality-critical and one-shot per user.
   const response = await anthropic.messages.create({
-    model: "claude-sonnet-4-20250514",
+    model: MODELS.polish,
     max_tokens: 500,
     messages: [{ role: "user", content: prompt }],
   });
