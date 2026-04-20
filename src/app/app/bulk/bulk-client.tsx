@@ -158,7 +158,6 @@ export default function BulkClient({
               onPostChange={() => {}}
               onCopy={() => copyPost(p.id, p.post)}
               onSave={() => {}}
-              onRegenerate={() => {}}
               copied={copiedId === p.id}
               isFavorite={false}
             />

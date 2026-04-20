@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Copy, Check, Pencil, RefreshCw, Heart } from "lucide-react";
+import { Copy, Check, Pencil, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface LinkedInPreviewProps {
@@ -13,7 +13,6 @@ interface LinkedInPreviewProps {
   onPostChange: (text: string) => void;
   onCopy: () => void;
   onSave: () => void;
-  onRegenerate: () => void;
   copied: boolean;
   isFavorite?: boolean;
 }
@@ -27,7 +26,6 @@ export default function LinkedInPreview({
   onPostChange,
   onCopy,
   onSave,
-  onRegenerate,
   copied,
   isFavorite,
 }: LinkedInPreviewProps) {
@@ -118,13 +116,6 @@ export default function LinkedInPreview({
             aria-label="Save"
           >
             <Heart className={cn("h-3.5 w-3.5", isFavorite && "fill-current")} />
-          </button>
-          <button
-            onClick={onRegenerate}
-            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium text-zinc-600 transition-colors hover:bg-zinc-100"
-            aria-label="Regenerate"
-          >
-            <RefreshCw className="h-3.5 w-3.5" />
           </button>
         </div>
       </div>

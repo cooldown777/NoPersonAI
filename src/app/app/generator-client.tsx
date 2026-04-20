@@ -147,7 +147,7 @@ export default function GeneratorClient({
         onChange={setInput}
         onGenerate={generate}
         isGenerating={isGenerating}
-        disabled={limitReached}
+        disabled={limitReached || !!result}
         isPro={isPro}
       />
 
@@ -172,6 +172,13 @@ export default function GeneratorClient({
 
       {result && currentPost && (
         <div className="space-y-3">
+          <button
+            type="button"
+            onClick={() => { setResult(null); setCurrentPost(""); setInput(""); setIsFavorite(false); }}
+            className="text-sm font-medium text-brand-600 hover:text-brand-700"
+          >
+            ← New post
+          </button>
           <LinkedInPreview
             post={currentPost}
             userName={userName}
@@ -181,7 +188,6 @@ export default function GeneratorClient({
             onPostChange={setCurrentPost}
             onCopy={handleCopy}
             onSave={handleSave}
-            onRegenerate={generate}
             copied={copied}
             isFavorite={isFavorite}
           />
