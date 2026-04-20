@@ -29,7 +29,7 @@ export default function SignInForm({ callbackUrl, initialError }: SignInFormProp
   const [isSendingEmail, setIsSendingEmail] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(initialError || null);
-  const target = callbackUrl || "/onboarding";
+  const target = callbackUrl || "/app";
 
   async function handleEmail(e: React.FormEvent) {
     e.preventDefault();
