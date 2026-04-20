@@ -6,21 +6,23 @@ import { Menu, X } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { cn } from "@/lib/utils";
-
-const navItems = [
-  { label: "How it works", href: "#how-it-works" },
-  { label: "WhatsApp", href: "#whatsapp" },
-  { label: "Pricing", href: "/pricing" },
-  { label: "FAQ", href: "#faq" },
-];
+import { useI18n } from "@/i18n/use-i18n";
 
 function isHashOnSamePage(href: string): boolean {
   return href.startsWith("#");
 }
 
 export default function Header() {
+  const { t } = useI18n();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const navItems = [
+    { label: t("nav.howItWorks"), href: "#how-it-works" },
+    { label: t("nav.whatsapp"), href: "#whatsapp" },
+    { label: t("nav.pricing"), href: "/pricing" },
+    { label: t("nav.faq"), href: "#faq" },
+  ];
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -74,13 +76,13 @@ export default function Header() {
             href="/auth/signin"
             className="inline-flex h-9 items-center rounded-lg px-4 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
           >
-            Sign in
+            {t("common.signIn")}
           </Link>
           <Link
             href="/auth/signin"
             className="inline-flex h-9 items-center justify-center rounded-md bg-brand-600 px-3 text-sm font-medium text-white shadow-sm transition-colors hover:bg-brand-700 active:bg-brand-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
           >
-            Start free
+            {t("common.startFree")}
           </Link>
         </div>
 
@@ -118,14 +120,14 @@ export default function Header() {
                 className="rounded-lg px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
                 onClick={() => setMenuOpen(false)}
               >
-                Sign in
+                {t("common.signIn")}
               </Link>
               <Link
                 href="/auth/signin"
                 onClick={() => setMenuOpen(false)}
                 className="mt-2 inline-flex h-10 w-full items-center justify-center rounded-lg bg-brand-600 px-4 text-sm font-medium text-white shadow-sm transition-colors hover:bg-brand-700 active:bg-brand-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
               >
-                Start free
+                {t("common.startFree")}
               </Link>
             </nav>
           </div>

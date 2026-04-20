@@ -3,7 +3,7 @@ export interface IntentAnalysis {
   goal: "educate" | "inspire" | "sell" | "entertain";
   keyMessage: string;
   targetEmotion: string;
-  detectedLanguage: "de" | "en";
+  detectedLanguage: "de" | "en" | "fr" | "es";
 }
 
 export interface StructureSelection {

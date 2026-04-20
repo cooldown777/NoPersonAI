@@ -8,6 +8,7 @@ import StepBasics from "@/components/onboarding/StepBasics";
 import StepTone from "@/components/onboarding/StepTone";
 import StepStyle from "@/components/onboarding/StepStyle";
 import StepDNAResult from "@/components/onboarding/StepDNAResult";
+import { isLocale, type Locale } from "@/i18n/config";
 
 export default function OnboardingClient() {
   const { data: session } = useSession();
@@ -16,7 +17,7 @@ export default function OnboardingClient() {
   const [step, setStep] = useState(1);
   const [name, setName] = useState(session?.user?.name || "");
   const [audience, setAudience] = useState("");
-  const [language, setLanguage] = useState<"de" | "en">("en");
+  const [language, setLanguage] = useState<Locale>("en");
   const [selectedTones, setSelectedTones] = useState<string[]>([]);
   const [emojiUsage, setEmojiUsage] = useState("light");
   const [samplePosts, setSamplePosts] = useState<string[]>([]);
@@ -31,7 +32,7 @@ export default function OnboardingClient() {
   function handleBasicChange(field: string, value: string) {
     if (field === "name") setName(value);
     if (field === "audience") setAudience(value);
-    if (field === "language") setLanguage(value as "de" | "en");
+    if (field === "language" && isLocale(value)) setLanguage(value);
   }
 
   function toggleTone(tone: string) {

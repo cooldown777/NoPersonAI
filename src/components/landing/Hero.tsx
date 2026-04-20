@@ -5,8 +5,10 @@ import Link from "next/link";
 import { ArrowRight, Sparkles, Check, Copy } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
+import { useI18n } from "@/i18n/use-i18n";
 
 export default function Hero() {
+  const { t } = useI18n();
   const [input, setInput] = useState("");
   const [result, setResult] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -26,12 +28,12 @@ export default function Hero() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error || "Generation failed");
+        setError(data.error || t("hero.generationFailed"));
       } else {
         setResult(data.post);
       }
     } catch {
-      setError("Network error. Try again.");
+      setError(t("hero.networkError"));
     } finally {
       setLoading(false);
     }
@@ -51,35 +53,28 @@ export default function Hero() {
         <div className="mx-auto max-w-3xl text-center">
           <Badge variant="brand" className="mb-5">
             <Sparkles className="h-3 w-3" />
-            Now with WhatsApp voice notes
+            {t("hero.badge")}
           </Badge>
           <h1 className="font-display text-4xl font-bold leading-[1.05] tracking-tight text-zinc-900 md:text-6xl">
-            A LinkedIn ghostwriter that{" "}
-            <span className="relative inline-block">
-              <span className="relative z-10 bg-gradient-to-br from-brand-600 to-brand-800 bg-clip-text text-transparent">
-                sounds exactly like you
-              </span>
-            </span>
-            .
+            {t("hero.title")}
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-base text-zinc-600 md:text-lg">
-            Send a rough idea or a voice note via WhatsApp. Get a ready-to-post
-            LinkedIn post in your voice — not generic AI slop.
+            {t("hero.subtitle")}
           </p>
 
           <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link href="/auth/signin" className="w-full sm:w-auto">
               <Button size="xl" rightIcon={<ArrowRight className="h-4 w-4" />} fullWidth>
-                Start free — 5 posts/month
+                {t("hero.ctaPrimary")}
               </Button>
             </Link>
             <Link href="#demo" className="w-full sm:w-auto">
               <Button size="xl" variant="outline" fullWidth>
-                See the demo
+                {t("hero.ctaSecondary")}
               </Button>
             </Link>
           </div>
-          <p className="mt-3 text-xs text-zinc-500">No credit card · 60-second sign-up</p>
+          <p className="mt-3 text-xs text-zinc-500">{t("hero.noCard")}</p>
         </div>
 
         <div id="demo" className="mx-auto mt-14 max-w-2xl scroll-mt-20">
@@ -96,7 +91,7 @@ export default function Hero() {
               <textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Type a rough idea — e.g. 'Lessons from my worst hire'"
+                placeholder={t("hero.inputPlaceholder")}
                 className="block h-28 w-full resize-none rounded-t-2xl px-4 py-3 text-sm focus:outline-none"
                 maxLength={400}
               />
@@ -109,7 +104,7 @@ export default function Hero() {
                   onClick={onGenerate}
                   rightIcon={!loading && <ArrowRight className="h-3.5 w-3.5" />}
                 >
-                  Generate preview
+                  {t("hero.generate")}
                 </Button>
               </div>
             </div>
@@ -124,7 +119,7 @@ export default function Hero() {
           {result && (
             <div className="mt-4 rounded-3xl border border-brand-200 bg-white p-5 shadow-xl shadow-brand-600/10">
               <div className="flex items-center justify-between">
-                <Badge variant="brand">Generated</Badge>
+                <Badge variant="brand">{t("hero.generated")}</Badge>
                 <button
                   type="button"
                   onClick={copy}
@@ -133,12 +128,12 @@ export default function Hero() {
                   {copied ? (
                     <>
                       <Check className="h-3.5 w-3.5 text-accent-600" />
-                      Copied
+                      {t("hero.copied")}
                     </>
                   ) : (
                     <>
                       <Copy className="h-3.5 w-3.5" />
-                      Copy
+                      {t("hero.copy")}
                     </>
                   )}
                 </button>
@@ -147,9 +142,9 @@ export default function Hero() {
                 {result}
               </pre>
               <div className="mt-4 border-t border-zinc-100 pt-3 text-xs text-zinc-500">
-                This used a generic voice profile.{" "}
+                {t("hero.genericProfile")}{" "}
                 <Link href="/auth/signin" className="font-medium text-brand-600 hover:text-brand-700">
-                  Train your own Writing DNA →
+                  {t("hero.trainYourDna")}
                 </Link>
               </div>
             </div>

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Check, MessageCircle, Mic, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/i18n/use-i18n";
 import PricingToggle, { type BillingPeriod } from "./PricingToggle";
 import {
   computeYearlyPrice,
@@ -15,6 +16,7 @@ const MONTHLY_PRO_EUR = 29;
 const YEARLY_TOTAL = computeYearlyPrice(MONTHLY_PRO_EUR);
 
 export default function PricingSection() {
+  const { t, tArray } = useI18n();
   const [period, setPeriod] = useState<BillingPeriod>("monthly");
 
   useEffect(() => {
@@ -28,28 +30,22 @@ export default function PricingSection() {
   }
 
   const proPrice = period === "monthly"
-    ? { big: "€29", small: "/month", sub: null }
+    ? { big: "€29", small: t("pricing.perMonth"), sub: null }
     : {
         big: formatMonthlyEquivalent(YEARLY_TOTAL),
-        small: "/month",
-        sub: `billed €${YEARLY_TOTAL}/yr · Save 15%`,
+        small: t("pricing.perMonth"),
+        sub: t("pricing.billedYearly", { total: YEARLY_TOTAL }),
       };
 
   const tiers = [
     {
       name: "Free",
       priceBig: "€0",
-      priceSmall: "forever",
+      priceSmall: t("pricing.forever"),
       priceSub: null as string | null,
-      description: "Try NoPersonAI and ship a few posts.",
-      features: [
-        "5 posts / month",
-        "Writing DNA profile",
-        "5-step AI generation chain",
-        "10+ one-tap refinements",
-        "Post history",
-      ],
-      cta: "Start free",
+      description: t("pricing.free.description"),
+      features: tArray("pricing.free.features"),
+      cta: t("pricing.free.cta"),
       featured: false,
       badge: null as string | null,
     },
@@ -58,18 +54,11 @@ export default function PricingSection() {
       priceBig: proPrice.big,
       priceSmall: proPrice.small,
       priceSub: proPrice.sub,
-      description: "For founders and operators posting weekly.",
-      features: [
-        "Unlimited posts",
-        "WhatsApp integration (text + voice)",
-        "Browser voice recording",
-        "Priority generation speed",
-        "Priority support",
-        "Everything in Free",
-      ],
-      cta: "Upgrade to Pro",
+      description: t("pricing.pro.description"),
+      features: tArray("pricing.pro.features"),
+      cta: t("pricing.pro.cta"),
       featured: true,
-      badge: "Most popular",
+      badge: t("pricing.pro.badge"),
     },
   ];
 
@@ -85,16 +74,20 @@ export default function PricingSection() {
       <div className="mx-auto max-w-6xl px-4 py-14 md:px-6 md:py-24">
         <div className="mx-auto max-w-2xl text-center">
           <p className="font-display text-sm font-semibold uppercase tracking-wider text-brand-600">
-            Pricing
+            {t("pricing.eyebrow")}
           </p>
           <h2 className="mt-2 font-display text-2xl font-bold tracking-tight text-zinc-900 md:text-4xl">
-            Start free. Upgrade when you&apos;re hooked.
+            {t("pricing.title")}
           </h2>
           <p className="mt-3 text-base text-zinc-600">
-            Simple, honest pricing. Cancel anytime. No per-post fees.
+            {t("pricing.subtitle")}
           </p>
           <div className="mt-6 flex justify-center">
-            <PricingToggle value={period} onChange={handleChange} />
+            <PricingToggle
+              value={period}
+              onChange={handleChange}
+              discountLabel={t("pricing.save15")}
+            />
           </div>
         </div>
 

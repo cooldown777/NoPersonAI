@@ -6,32 +6,37 @@ import { PenSquare, Clock, Dna, User, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/brand/Logo";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { useI18n } from "@/i18n/use-i18n";
 
-const tabs = [
-  { label: "Create", href: "/app", icon: PenSquare, match: (p: string) => p === "/app" },
-  {
-    label: "WhatsApp",
-    href: "/app/whatsapp",
-    icon: MessageCircle,
-    match: (p: string) => p.startsWith("/app/whatsapp"),
-  },
-  {
-    label: "History",
-    href: "/app/history",
-    icon: Clock,
-    match: (p: string) => p.startsWith("/app/history"),
-  },
-  { label: "DNA", href: "/app/dna", icon: Dna, match: (p: string) => p.startsWith("/app/dna") },
-  {
-    label: "Account",
-    href: "/app/account",
-    icon: User,
-    match: (p: string) => p.startsWith("/app/account"),
-  },
-];
+function useTabs() {
+  const { t } = useI18n();
+  return [
+    { label: t("appShell.navCreate"), href: "/app", icon: PenSquare, match: (p: string) => p === "/app" },
+    {
+      label: t("appShell.navWhatsApp"),
+      href: "/app/whatsapp",
+      icon: MessageCircle,
+      match: (p: string) => p.startsWith("/app/whatsapp"),
+    },
+    {
+      label: t("appShell.navHistory"),
+      href: "/app/history",
+      icon: Clock,
+      match: (p: string) => p.startsWith("/app/history"),
+    },
+    { label: t("appShell.navDna"), href: "/app/dna", icon: Dna, match: (p: string) => p.startsWith("/app/dna") },
+    {
+      label: t("appShell.navAccount"),
+      href: "/app/account",
+      icon: User,
+      match: (p: string) => p.startsWith("/app/account"),
+    },
+  ];
+}
 
 export default function BottomNav() {
   const pathname = usePathname();
+  const tabs = useTabs();
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-zinc-200 bg-white/95 pb-safe backdrop-blur md:hidden">
       <div className="mx-auto flex max-w-lg items-stretch justify-around px-2">
@@ -59,6 +64,7 @@ export default function BottomNav() {
 
 export function SideNav() {
   const pathname = usePathname();
+  const tabs = useTabs();
   return (
     <aside className="hidden w-60 shrink-0 border-r border-zinc-200 bg-white md:flex md:flex-col">
       <div className="flex h-16 items-center border-b border-zinc-100 px-5">

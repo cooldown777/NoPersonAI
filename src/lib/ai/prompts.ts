@@ -1,5 +1,18 @@
 import { WritingDNAInput } from "./types";
 
+function languageLabel(code: string): string {
+  switch (code) {
+    case "de":
+      return "German (Deutsch)";
+    case "fr":
+      return "French (Français)";
+    case "es":
+      return "Spanish (Español)";
+    default:
+      return "English";
+  }
+}
+
 export function buildIntentAndStructurePrompt(
   userInput: string,
   dnaProfile: string,
@@ -21,7 +34,7 @@ Shape:
     "goal": "educate" | "inspire" | "sell" | "entertain",
     "keyMessage": "the one thing the reader should take away",
     "targetEmotion": "the emotion this should evoke",
-    "detectedLanguage": "de" | "en"
+    "detectedLanguage": "de" | "en" | "fr" | "es"
   },
   "structure": {
     "structure": "hook_story" | "contrarian" | "personal" | "list" | "lesson",
@@ -60,7 +73,7 @@ HARD STYLE RULES:
 - Tone: ${dna.tone}
 - Sentence style: ${dna.style}
 - Emoji usage: ${dna.emojiUsage} (if "none", use zero emojis — not even in bullets)
-- Language: Write in ${language === "de" ? "German (Deutsch)" : "English"}
+- Language: Write in ${languageLabel(language)}
 
 THINGS THAT MAKE POSTS READ AS AI (avoid all of these):
 - Rhetorical questions like "Agree?", "What do you think?", "Sound familiar?"
@@ -160,7 +173,7 @@ ${currentPost}
 VOICE (preserve this at all costs):
 ${dna.generatedProfile}
 Tone: ${dna.tone} · Style: ${dna.style} · Emojis: ${dna.emojiUsage}
-Language: ${language === "de" ? "German" : "English"}
+Language: ${languageLabel(language)}
 
 Output ONLY the refined post. No preamble, no quotes wrapping it.`;
 }
@@ -185,12 +198,6 @@ export function buildDNAProfilePrompt(
   const minimalInputs =
     samplePosts.length === 0 && !styleDiscoveryAnswers;
 
-  const languageLabel =
-    language === "de" ? "German (Deutsch)"
-    : language === "fr" ? "French (Français)"
-    : language === "es" ? "Spanish (Español)"
-    : "English";
-
   return `Write a short Writing DNA profile for this person. The profile will be loaded as system context for every AI-written post, so it must be concrete and actionable.
 
 INPUTS:
@@ -201,7 +208,7 @@ INPUTS:
 ${styleContext}
 ${minimalInputs ? "\nNote: inputs are minimal. Produce a usable generic profile anchored on the tone/style/emoji settings." : ""}
 
-Write 2-3 short sentences, max 60 words total, in ${languageLabel}. Mention:
+Write 2-3 short sentences, max 60 words total, in ${languageLabel(language)}. Mention:
 1. The tone + one signature move
 2. Sentence rhythm / length
 3. Emoji habit (only if non-default)
