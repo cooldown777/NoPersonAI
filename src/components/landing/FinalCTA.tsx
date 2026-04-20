@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/Button";
 
 export default function FinalCTA() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-brand-600 to-brand-800 text-white">
+    <section id="get-started" className="relative overflow-hidden bg-gradient-to-br from-brand-600 to-brand-800 text-white scroll-mt-20">
       <div className="absolute inset-0 opacity-30">
         <div className="absolute right-0 top-0 h-96 w-96 rounded-full bg-accent-500/40 blur-3xl" />
         <div className="absolute bottom-0 left-0 h-80 w-80 rounded-full bg-brand-300/30 blur-3xl" />

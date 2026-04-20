@@ -20,7 +20,7 @@ const items = [
 
 export default function PainPoints() {
   return (
-    <section className="border-y border-zinc-100 bg-zinc-50/80">
+    <section id="pain-points" className="border-y border-zinc-100 bg-zinc-50/80 scroll-mt-20">
       <div className="mx-auto max-w-6xl px-4 py-14 md:px-6 md:py-20">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="font-display text-2xl font-bold tracking-tight text-zinc-900 md:text-4xl">

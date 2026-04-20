@@ -24,7 +24,7 @@ The lesson: effort before access beats credentials every time.`;
 
 export default function PostPreviewSection() {
   return (
-    <section className="bg-zinc-50">
+    <section id="preview" className="bg-zinc-50 scroll-mt-20">
       <div className="mx-auto max-w-6xl px-4 py-14 md:px-6 md:py-24">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="font-display text-2xl font-bold tracking-tight text-zinc-900 md:text-4xl">

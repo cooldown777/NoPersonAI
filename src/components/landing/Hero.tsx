@@ -45,7 +45,7 @@ export default function Hero() {
   }
 
   return (
-    <section className="relative overflow-hidden bg-brand-radial">
+    <section id="top" className="relative overflow-hidden bg-brand-radial scroll-mt-20">
       <div className="absolute inset-0 bg-grid opacity-60" />
       <div className="relative mx-auto max-w-6xl px-4 pb-16 pt-10 md:px-6 md:pb-24 md:pt-20">
         <div className="mx-auto max-w-3xl text-center">

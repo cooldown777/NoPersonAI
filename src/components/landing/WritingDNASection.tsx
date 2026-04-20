@@ -20,7 +20,7 @@ const features = [
 
 export default function WritingDNASection() {
   return (
-    <section className="relative bg-white">
+    <section id="dna" className="relative bg-white scroll-mt-20">
       <div className="mx-auto max-w-6xl px-4 py-14 md:px-6 md:py-24">
         <div className="grid items-center gap-10 md:grid-cols-2 md:gap-16">
           <div>
