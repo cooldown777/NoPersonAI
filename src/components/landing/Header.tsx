@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -68,6 +69,7 @@ export default function Header() {
         </nav>
 
         <div className="hidden items-center gap-2 md:flex">
+          <LanguageSwitcher />
           <Link
             href="/auth/signin"
             className="inline-flex h-9 items-center rounded-lg px-4 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
@@ -108,6 +110,9 @@ export default function Header() {
                 </Link>
               ))}
               <div className="my-2 h-px bg-zinc-100" />
+              <div className="px-3 py-1">
+                <LanguageSwitcher />
+              </div>
               <Link
                 href="/auth/signin"
                 className="rounded-lg px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50"

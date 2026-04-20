@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { PenSquare, Clock, Dna, User, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/brand/Logo";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 const tabs = [
   { label: "Create", href: "/app", icon: PenSquare, match: (p: string) => p === "/app" },
@@ -86,6 +87,9 @@ export function SideNav() {
           );
         })}
       </nav>
+      <div className="border-t border-zinc-100 px-3 py-3">
+        <LanguageSwitcher />
+      </div>
     </aside>
   );
 }

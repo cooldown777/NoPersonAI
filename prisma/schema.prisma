@@ -39,6 +39,8 @@ enum OnboardingMethod {
 enum Language {
   de
   en
+  fr
+  es
 }
 
 enum PostStructure {
