@@ -182,21 +182,29 @@ export function buildDNAProfilePrompt(
     styleContext += `\n\nSTYLE DISCOVERY ANSWERS:\n${JSON.stringify(styleDiscoveryAnswers, null, 2)}`;
   }
 
-  return `Analyze this person's writing style and create a Writing DNA profile. This profile will be loaded as system context for every future post our AI writes for them, so it must be precise, concrete, and behavioral — not generic.
+  const minimalInputs =
+    samplePosts.length === 0 && !styleDiscoveryAnswers;
+
+  const languageLabel =
+    language === "de" ? "German (Deutsch)"
+    : language === "fr" ? "French (Français)"
+    : language === "es" ? "Spanish (Español)"
+    : "English";
+
+  return `Write a short Writing DNA profile for this person. The profile will be loaded as system context for every AI-written post, so it must be concrete and actionable.
 
 INPUTS:
-- Self-described tone: ${tone}
-- Target audience: ${audience}
-- Writing style preference: ${style}
-- Emoji usage preference: ${emojiUsage}
+- Tone: ${tone || "professional"}
+- Audience: ${audience || "(not specified)"}
+- Style: ${style || "mixed"}
+- Emoji usage: ${emojiUsage || "light"}
 ${styleContext}
+${minimalInputs ? "\nNote: inputs are minimal. Produce a usable generic profile anchored on the tone/style/emoji settings." : ""}
 
-Write a 3-5 sentence profile in ${language === "de" ? "German" : "English"} that captures, with specifics:
-1. Sentence rhythm (short/long, fragments/complete, declarative/reflective)
-2. Personality cues (warm vs sharp, humble vs bold, dry vs playful)
-3. How they open and close — specific verbs or moves they use
-4. Vocabulary register (technical? plain? literary?) — give concrete word-choices they favor or avoid
-5. Any signature quirks (asides, one-word lines, specific punctuation habits)
+Write 2-3 short sentences, max 60 words total, in ${languageLabel}. Mention:
+1. The tone + one signature move
+2. Sentence rhythm / length
+3. Emoji habit (only if non-default)
 
-Output ONLY the profile text. Write in second-person-as-instruction: "This person writes…". Do not use bullet points. Do not hedge ("might", "sometimes"); be decisive.`;
+Write in second-person-as-instruction ("This person writes..."). No bullet points. Be decisive — no "might" or "sometimes". Output ONLY the profile text.`;
 }
