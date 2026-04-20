@@ -43,6 +43,11 @@ enum Language {
   es
 }
 
+enum Role {
+  user
+  admin
+}
+
 enum PostStructure {
   hook_story
   contrarian
@@ -128,6 +133,7 @@ model User {
   image              String?
   phoneE164          String?   @unique
   plan               Plan      @default(free)
+  role               Role      @default(user)
   postsUsedThisMonth Int       @default(0)
   postsResetAt       DateTime  @default(now())
   createdAt          DateTime  @default(now())
