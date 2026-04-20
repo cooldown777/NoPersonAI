@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Check, MessageCircle, Mic, Sparkles } from "lucide-react";
+import { Check, MessageCircle, Mic, Sparkles, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/i18n/use-i18n";
 import PricingToggle, { type BillingPeriod } from "./PricingToggle";
@@ -37,17 +37,29 @@ export default function PricingSection() {
         sub: t("pricing.billedYearly", { total: YEARLY_TOTAL }),
       };
 
-  const tiers = [
+  const tiers: Array<{
+    name: string;
+    priceBig: string;
+    priceSmall: string;
+    priceSub: string | null;
+    description: string;
+    features: string[];
+    featureIcons: (LucideIcon | null)[];
+    cta: string;
+    featured: boolean;
+    badge: string | null;
+  }> = [
     {
       name: "Free",
       priceBig: "€0",
       priceSmall: t("pricing.forever"),
-      priceSub: null as string | null,
+      priceSub: null,
       description: t("pricing.free.description"),
       features: tArray("pricing.free.features"),
+      featureIcons: [],
       cta: t("pricing.free.cta"),
       featured: false,
-      badge: null as string | null,
+      badge: null,
     },
     {
       name: "Pro",
@@ -56,6 +68,7 @@ export default function PricingSection() {
       priceSub: proPrice.sub,
       description: t("pricing.pro.description"),
       features: tArray("pricing.pro.features"),
+      featureIcons: [null, MessageCircle, Mic, null, null, null],
       cta: t("pricing.pro.cta"),
       featured: true,
       badge: t("pricing.pro.badge"),
@@ -133,20 +146,20 @@ export default function PricingSection() {
               </div>
 
               <ul className="mt-6 space-y-3">
-                {tier.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2.5 text-sm text-zinc-700">
-                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-accent-600" />
-                    <span>
-                      {f.includes("WhatsApp") && (
-                        <MessageCircle className="mr-1 inline-block h-3.5 w-3.5 text-accent-600" />
-                      )}
-                      {f.includes("voice recording") && (
-                        <Mic className="mr-1 inline-block h-3.5 w-3.5 text-accent-600" />
-                      )}
-                      {f}
-                    </span>
-                  </li>
-                ))}
+                {tier.features.map((f, idx) => {
+                  const Icon = tier.featureIcons[idx] ?? null;
+                  return (
+                    <li key={f} className="flex items-start gap-2.5 text-sm text-zinc-700">
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-accent-600" />
+                      <span>
+                        {Icon && (
+                          <Icon className="mr-1 inline-block h-3.5 w-3.5 text-accent-600" />
+                        )}
+                        {f}
+                      </span>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           ))}
