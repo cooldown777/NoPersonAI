@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
+import { useSession } from "next-auth/react";
 import { Logo } from "@/components/brand/Logo";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { cn } from "@/lib/utils";
@@ -14,6 +15,8 @@ function isHashOnSamePage(href: string): boolean {
 
 export default function Header() {
   const { t } = useI18n();
+  const { data: session } = useSession();
+  const isLoggedIn = !!session?.user;
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -72,18 +75,29 @@ export default function Header() {
 
         <div className="hidden items-center gap-2 md:flex">
           <LanguageSwitcher />
-          <Link
-            href="/auth/signin"
-            className="inline-flex h-9 items-center rounded-lg px-4 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
-          >
-            {t("common.signIn")}
-          </Link>
-          <Link
-            href="/auth/signin"
-            className="inline-flex h-9 items-center justify-center rounded-md bg-brand-600 px-3 text-sm font-medium text-white shadow-sm transition-colors hover:bg-brand-700 active:bg-brand-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
-          >
-            {t("common.startFree")}
-          </Link>
+          {isLoggedIn ? (
+            <Link
+              href="/dashboard"
+              className="inline-flex h-9 items-center justify-center rounded-md bg-brand-600 px-4 text-sm font-medium text-white shadow-sm transition-colors hover:bg-brand-700 active:bg-brand-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+            >
+              Dashboard
+            </Link>
+          ) : (
+            <>
+              <Link
+                href="/auth/signin"
+                className="inline-flex h-9 items-center rounded-lg px-4 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
+              >
+                {t("common.signIn")}
+              </Link>
+              <Link
+                href="/auth/signin"
+                className="inline-flex h-9 items-center justify-center rounded-md bg-brand-600 px-3 text-sm font-medium text-white shadow-sm transition-colors hover:bg-brand-700 active:bg-brand-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+              >
+                {t("common.startFree")}
+              </Link>
+            </>
+          )}
         </div>
 
         <button
@@ -115,20 +129,32 @@ export default function Header() {
               <div className="px-3 py-1">
                 <LanguageSwitcher />
               </div>
-              <Link
-                href="/auth/signin"
-                className="rounded-lg px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
-                onClick={() => setMenuOpen(false)}
-              >
-                {t("common.signIn")}
-              </Link>
-              <Link
-                href="/auth/signin"
-                onClick={() => setMenuOpen(false)}
-                className="mt-2 inline-flex h-10 w-full items-center justify-center rounded-lg bg-brand-600 px-4 text-sm font-medium text-white shadow-sm transition-colors hover:bg-brand-700 active:bg-brand-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
-              >
-                {t("common.startFree")}
-              </Link>
+              {isLoggedIn ? (
+                <Link
+                  href="/dashboard"
+                  onClick={() => setMenuOpen(false)}
+                  className="mt-2 inline-flex h-10 w-full items-center justify-center rounded-lg bg-brand-600 px-4 text-sm font-medium text-white shadow-sm transition-colors hover:bg-brand-700"
+                >
+                  Dashboard
+                </Link>
+              ) : (
+                <>
+                  <Link
+                    href="/auth/signin"
+                    className="rounded-lg px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    {t("common.signIn")}
+                  </Link>
+                  <Link
+                    href="/auth/signin"
+                    onClick={() => setMenuOpen(false)}
+                    className="mt-2 inline-flex h-10 w-full items-center justify-center rounded-lg bg-brand-600 px-4 text-sm font-medium text-white shadow-sm transition-colors hover:bg-brand-700 active:bg-brand-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+                  >
+                    {t("common.startFree")}
+                  </Link>
+                </>
+              )}
             </nav>
           </div>
         </div>

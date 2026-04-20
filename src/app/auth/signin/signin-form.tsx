@@ -1,6 +1,6 @@
 "use client";
 
-import { signIn } from "next-auth/react";
+import { signIn, signOut } from "next-auth/react";
 import { useState } from "react";
 import Link from "next/link";
 import { Mail, ArrowRight, AlertCircle } from "lucide-react";
@@ -104,8 +104,9 @@ export default function SignInForm({ callbackUrl, initialError }: SignInFormProp
                 size="lg"
                 fullWidth
                 loading={isGoogleLoading}
-                onClick={() => {
+                onClick={async () => {
                   setIsGoogleLoading(true);
+                  await signOut({ redirect: false });
                   signIn("google", { callbackUrl: target });
                 }}
                 leftIcon={

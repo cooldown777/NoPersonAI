@@ -64,7 +64,7 @@ export const authOptions: NextAuthOptions = {
       options: { httpOnly: true, sameSite: "none", path: "/", secure: true },
     },
   },
-  session: { strategy: "database" },
+  session: { strategy: "database", maxAge: 30 * 24 * 60 * 60 },
   pages: {
     signIn: "/auth/signin",
     verifyRequest: "/auth/verify-request",
