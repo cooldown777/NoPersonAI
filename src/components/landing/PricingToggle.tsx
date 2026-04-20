@@ -16,7 +16,11 @@ export default function PricingToggle({
   discountLabel = "Save 15%",
 }: PricingToggleProps) {
   return (
-    <div className="inline-flex items-center gap-3 rounded-full border border-zinc-200 bg-white p-1">
+    <div
+      role="group"
+      aria-label="Billing period"
+      className="inline-flex items-center gap-3 rounded-full border border-zinc-200 bg-white p-1"
+    >
       <button
         type="button"
         aria-pressed={value === "monthly"}
@@ -33,6 +37,7 @@ export default function PricingToggle({
       <button
         type="button"
         aria-pressed={value === "yearly"}
+        aria-label={`Yearly, ${discountLabel.toLowerCase()}`}
         onClick={() => onChange("yearly")}
         className={cn(
           "inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
@@ -43,6 +48,7 @@ export default function PricingToggle({
       >
         Yearly
         <span
+          aria-hidden="true"
           className={cn(
             "rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide",
             value === "yearly"
