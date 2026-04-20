@@ -43,11 +43,6 @@ export default function StepStyle({
     }
   }
 
-  const hasContent =
-    samplePosts.some((p) => p.trim().length > 0) ||
-    Object.keys(styleDiscoveryAnswers).length >= 3 ||
-    writingExercise.trim().length > 0;
-
   if (!mode) {
     return (
       <div className="space-y-6">
@@ -83,6 +78,18 @@ export default function StepStyle({
             </div>
             <div className="text-xs text-gray-500">
               We&apos;ll help you find your style
+            </div>
+          </button>
+
+          <button
+            onClick={onNext}
+            className="w-full rounded-lg border border-dashed border-gray-200 bg-white px-4 py-4 text-left hover:border-gray-300 transition-colors"
+          >
+            <div className="text-sm font-medium text-gray-900">
+              Skip — train my DNA later
+            </div>
+            <div className="text-xs text-gray-500">
+              We&apos;ll start with sensible defaults
             </div>
           </button>
         </div>
@@ -139,8 +146,7 @@ export default function StepStyle({
           </button>
           <button
             onClick={onNext}
-            disabled={!hasContent}
-            className="flex-1 rounded-lg bg-blue-600 px-4 py-3 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            className="flex-1 rounded-lg bg-blue-600 px-4 py-3 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
           >
             Analyze my style
           </button>
@@ -211,8 +217,7 @@ export default function StepStyle({
         </button>
         <button
           onClick={onNext}
-          disabled={!hasContent}
-          className="flex-1 rounded-lg bg-blue-600 px-4 py-3 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
+          className="flex-1 rounded-lg bg-blue-600 px-4 py-3 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
         >
           Generate my DNA
         </button>

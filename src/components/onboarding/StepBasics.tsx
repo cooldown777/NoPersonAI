@@ -27,7 +27,7 @@ export default function StepBasics({
       <div className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Your name
+            Your name <span className="text-gray-400">(optional)</span>
           </label>
           <input
             type="text"
@@ -60,7 +60,7 @@ export default function StepBasics({
 
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Who is your target audience?
+            Who is your target audience? <span className="text-gray-400">(optional)</span>
           </label>
           <p className="mt-1 text-xs text-gray-500">
             e.g. &quot;startup founders&quot;, &quot;HR managers&quot;,
@@ -78,8 +78,7 @@ export default function StepBasics({
 
       <button
         onClick={onNext}
-        disabled={!name.trim() || !audience.trim()}
-        className="w-full rounded-lg bg-blue-600 px-4 py-3 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
+        className="w-full rounded-lg bg-blue-600 px-4 py-3 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
       >
         Continue
       </button>

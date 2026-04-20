@@ -49,7 +49,7 @@ export default function StepTone({
       <div>
         <h2 className="text-xl font-bold text-gray-900">Your tone</h2>
         <p className="mt-1 text-sm text-gray-600">
-          Pick 1-2 that match how you want to sound
+          Pick 1-2 that match how you want to sound (optional)
         </p>
       </div>
 
@@ -108,8 +108,7 @@ export default function StepTone({
         </button>
         <button
           onClick={onNext}
-          disabled={selectedTones.length === 0}
-          className="flex-1 rounded-lg bg-blue-600 px-4 py-3 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
+          className="flex-1 rounded-lg bg-blue-600 px-4 py-3 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
         >
           Continue
         </button>
