@@ -54,6 +54,16 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
+  cookies: {
+    state: {
+      name: "next-auth.state",
+      options: { httpOnly: true, sameSite: "none", path: "/", secure: true },
+    },
+    pkceCodeVerifier: {
+      name: "next-auth.pkce.code_verifier",
+      options: { httpOnly: true, sameSite: "none", path: "/", secure: true },
+    },
+  },
   session: { strategy: "database" },
   pages: {
     signIn: "/auth/signin",
