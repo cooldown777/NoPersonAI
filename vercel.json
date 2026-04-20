@@ -4,6 +4,7 @@
     "src/app/api/whatsapp/webhook/route.ts": { "maxDuration": 60 },
     "src/app/api/transcribe/route.ts": { "maxDuration": 60 },
     "src/app/api/generate/route.ts": { "maxDuration": 60 },
+    "src/app/api/generate/bulk/route.ts": { "maxDuration": 120 },
     "src/app/api/refine/route.ts": { "maxDuration": 60 },
     "src/app/api/demo/route.ts": { "maxDuration": 60 }
   }
