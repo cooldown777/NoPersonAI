@@ -16,6 +16,7 @@ import {
   ChevronRight,
   List,
   LayoutGrid,
+  ChevronDown,
 } from "lucide-react";
 import { LinkedInIcon } from "@/components/brand/LinkedInIcon";
 import { Button } from "@/components/ui/Button";
@@ -61,6 +62,25 @@ function formatDateTime(iso: string): string {
   });
 }
 
+function relativeTime(iso: string): string {
+  const ms = new Date(iso).getTime() - Date.now();
+  const abs = Math.abs(ms);
+  const min = Math.round(abs / 60000);
+  const hr = Math.round(abs / 3600000);
+  const day = Math.round(abs / 86400000);
+  const past = ms < 0;
+  if (min < 1) return past ? "just now" : "in <1m";
+  if (min < 60) return past ? `${min}m ago` : `in ${min}m`;
+  if (hr < 24) return past ? `${hr}h ago` : `in ${hr}h`;
+  if (day < 30) return past ? `${day}d ago` : `in ${day}d`;
+  return formatDateTime(iso);
+}
+
+function hookOf(text: string): string {
+  const first = text.split("\n").find((l) => l.trim().length > 0) ?? text;
+  return first.length > 90 ? first.slice(0, 90) + "…" : first;
+}
+
 function toLocalInput(iso: string): string {
   const d = new Date(iso);
   const offset = d.getTimezoneOffset() * 60000;
@@ -72,6 +92,7 @@ export default function ScheduleClient({ linkedInConnected, initialSchedules }: 
   const [schedules, setSchedules] = useState<Schedule[]>(initialSchedules);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
   const [editContent, setEditContent] = useState("");
   const [editWhen, setEditWhen] = useState("");
   const [view, setView] = useState<"list" | "calendar">("list");
@@ -355,115 +376,168 @@ export default function ScheduleClient({ linkedInConnected, initialSchedules }: 
       )}
 
       {view === "list" && schedules.length > 0 && (
-        <div className="space-y-3">
-          {schedules.map((s) => {
+        <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white">
+          {schedules.map((s, i) => {
             const meta = statusMeta[s.status];
             const canAct = s.status === "pending" || s.status === "failed";
             const isEditing = editingId === s.id;
+            const isExpanded = expandedId === s.id || isEditing;
+            const chars = s.content.length;
             return (
-              <Card key={s.id}>
-                <CardContent className="space-y-3 p-5">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Clock className="h-3.5 w-3.5 text-zinc-500" />
-                    <span className="text-sm font-medium text-zinc-700">
-                      {formatDateTime(s.scheduledFor)}
-                    </span>
-                    <Badge variant={meta.variant} className="gap-1">
-                      {s.status === "published" && <CheckCircle2 className="h-3 w-3" />}
-                      {s.status === "failed" && <AlertCircle className="h-3 w-3" />}
-                      {s.status === "publishing" && <Loader2 className="h-3 w-3 animate-spin" />}
-                      {meta.label}
-                    </Badge>
+              <div
+                key={s.id}
+                className={cn(
+                  "transition-colors",
+                  i !== 0 && "border-t border-zinc-100",
+                  isExpanded && "bg-zinc-50/60",
+                )}
+              >
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (isEditing) return;
+                    setExpandedId(isExpanded ? null : s.id);
+                  }}
+                  className="flex w-full items-center gap-3 px-4 py-3.5 text-left hover:bg-zinc-50"
+                >
+                  <div
+                    className={cn(
+                      "inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-[11px] font-semibold",
+                      s.status === "published" && "bg-emerald-100 text-emerald-700",
+                      s.status === "failed" && "bg-red-100 text-red-700",
+                      s.status === "publishing" && "bg-amber-100 text-amber-700",
+                      s.status === "cancelled" && "bg-zinc-100 text-zinc-500",
+                      s.status === "pending" && "bg-brand-100 text-brand-700",
+                    )}
+                    aria-hidden
+                  >
+                    {new Date(s.scheduledFor).toLocaleDateString(undefined, {
+                      day: "2-digit",
+                    })}
                   </div>
 
-                  {isEditing ? (
-                    <div className="space-y-3">
-                      <textarea
-                        value={editContent}
-                        onChange={(e) => setEditContent(e.target.value)}
-                        rows={6}
-                        maxLength={3000}
-                        className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30"
-                      />
-                      <div>
-                        <label className="mb-1.5 block text-xs font-medium text-zinc-700">
-                          When
-                        </label>
-                        <input
-                          type="datetime-local"
-                          value={editWhen}
-                          onChange={(e) => setEditWhen(e.target.value)}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="truncate text-sm font-medium text-zinc-900">
+                        {hookOf(s.content)}
+                      </span>
+                    </div>
+                    <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-zinc-500">
+                      <Clock className="h-3 w-3" />
+                      <span>{relativeTime(s.scheduledFor)}</span>
+                      <span>·</span>
+                      <span>{formatDateTime(s.scheduledFor)}</span>
+                      <span>·</span>
+                      <span>{chars} chars</span>
+                    </div>
+                  </div>
+
+                  <Badge variant={meta.variant} className="shrink-0 gap-1">
+                    {s.status === "published" && <CheckCircle2 className="h-3 w-3" />}
+                    {s.status === "failed" && <AlertCircle className="h-3 w-3" />}
+                    {s.status === "publishing" && <Loader2 className="h-3 w-3 animate-spin" />}
+                    {meta.label}
+                  </Badge>
+
+                  <ChevronDown
+                    className={cn(
+                      "h-4 w-4 shrink-0 text-zinc-400 transition-transform",
+                      isExpanded && "rotate-180",
+                    )}
+                  />
+                </button>
+
+                {isExpanded && (
+                  <div className="space-y-3 border-t border-zinc-100 px-4 py-4">
+                    {isEditing ? (
+                      <>
+                        <textarea
+                          value={editContent}
+                          onChange={(e) => setEditContent(e.target.value)}
+                          rows={6}
+                          maxLength={3000}
                           className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30"
                         />
-                      </div>
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          onClick={() => saveEdit(s.id)}
-                          disabled={busyId === s.id}
-                          leftIcon={
-                            busyId === s.id ? (
-                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                            ) : undefined
-                          }
-                        >
-                          Save
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => setEditingId(null)}
-                          disabled={busyId === s.id}
-                        >
-                          Cancel
-                        </Button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="whitespace-pre-wrap rounded-xl bg-zinc-50 p-3 text-sm text-zinc-800">
-                      {s.content}
-                    </div>
-                  )}
-
-                  {s.failureReason && s.status === "failed" && !isEditing && (
-                    <div className="rounded-lg border border-red-200 bg-red-50 p-2 text-xs text-red-800">
-                      {s.failureReason}
-                    </div>
-                  )}
-
-                  {canAct && !isEditing && (
-                    <div className="flex flex-wrap gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => publishNow(s.id)}
-                        disabled={busyId === s.id || !linkedInConnected}
-                        leftIcon={<Send className="h-3.5 w-3.5" />}
-                      >
-                        Publish now
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => startEdit(s)}
-                        disabled={busyId === s.id}
-                        leftIcon={<Pencil className="h-3.5 w-3.5" />}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => cancel(s.id)}
-                        disabled={busyId === s.id}
-                        leftIcon={<Trash2 className="h-3.5 w-3.5" />}
-                      >
-                        Cancel
-                      </Button>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+                        <div>
+                          <label className="mb-1.5 block text-xs font-medium text-zinc-700">
+                            When
+                          </label>
+                          <input
+                            type="datetime-local"
+                            value={editWhen}
+                            onChange={(e) => setEditWhen(e.target.value)}
+                            className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30"
+                          />
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            onClick={() => saveEdit(s.id)}
+                            disabled={busyId === s.id}
+                            leftIcon={
+                              busyId === s.id ? (
+                                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                              ) : undefined
+                            }
+                          >
+                            Save
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setEditingId(null)}
+                            disabled={busyId === s.id}
+                          >
+                            Cancel
+                          </Button>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="whitespace-pre-wrap rounded-xl bg-white p-3 text-sm text-zinc-800 ring-1 ring-zinc-200">
+                          {s.content}
+                        </div>
+                        {s.failureReason && s.status === "failed" && (
+                          <div className="rounded-lg border border-red-200 bg-red-50 p-2 text-xs text-red-800">
+                            {s.failureReason}
+                          </div>
+                        )}
+                        {canAct && (
+                          <div className="flex flex-wrap gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => publishNow(s.id)}
+                              disabled={busyId === s.id || !linkedInConnected}
+                              leftIcon={<Send className="h-3.5 w-3.5" />}
+                            >
+                              Publish now
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => startEdit(s)}
+                              disabled={busyId === s.id}
+                              leftIcon={<Pencil className="h-3.5 w-3.5" />}
+                            >
+                              Edit
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => cancel(s.id)}
+                              disabled={busyId === s.id}
+                              leftIcon={<Trash2 className="h-3.5 w-3.5" />}
+                            >
+                              Cancel
+                            </Button>
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
             );
           })}
         </div>
