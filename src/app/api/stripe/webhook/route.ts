@@ -65,6 +65,17 @@ export async function POST(req: NextRequest) {
         break;
       }
 
+      case "invoice.payment_failed": {
+        const invoice = event.data.object as Stripe.Invoice;
+        const customerId = invoice.customer as string | null;
+        if (!customerId) break;
+        await prisma.user.updateMany({
+          where: { stripeCustomerId: customerId },
+          data: { stripeStatus: "past_due" },
+        });
+        break;
+      }
+
       case "customer.updated": {
         const cust = event.data.object as Stripe.Customer;
         const addr = cust.address;
