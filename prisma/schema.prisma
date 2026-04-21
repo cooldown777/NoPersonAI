@@ -147,6 +147,16 @@ model User {
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
 
+  billingName         String?
+  billingCompany      String?
+  billingEmail        String?
+  billingAddressLine1 String?
+  billingAddressLine2 String?
+  billingCity         String?
+  billingPostalCode   String?
+  billingCountry      String?
+  billingVatId        String?
+
   accounts            Account[]
   sessions            Session[]
   writingDna          WritingDNA?

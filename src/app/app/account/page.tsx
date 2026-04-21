@@ -11,7 +11,20 @@ export default async function AccountPage() {
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { plan: true, postsUsedThisMonth: true, postsResetAt: true },
+    select: {
+      plan: true,
+      postsUsedThisMonth: true,
+      postsResetAt: true,
+      billingName: true,
+      billingCompany: true,
+      billingEmail: true,
+      billingAddressLine1: true,
+      billingAddressLine2: true,
+      billingCity: true,
+      billingPostalCode: true,
+      billingCountry: true,
+      billingVatId: true,
+    },
   });
   if (!user) redirect("/auth/signin");
 
@@ -32,6 +45,17 @@ export default async function AccountPage() {
       email={session.user.email || ""}
       image={session.user.image || null}
       linkedInConnected={linkedInConnected}
+      billing={{
+        billingName: user.billingName ?? "",
+        billingCompany: user.billingCompany ?? "",
+        billingEmail: user.billingEmail ?? "",
+        billingAddressLine1: user.billingAddressLine1 ?? "",
+        billingAddressLine2: user.billingAddressLine2 ?? "",
+        billingCity: user.billingCity ?? "",
+        billingPostalCode: user.billingPostalCode ?? "",
+        billingCountry: user.billingCountry ?? "",
+        billingVatId: user.billingVatId ?? "",
+      }}
     />
   );
 }
