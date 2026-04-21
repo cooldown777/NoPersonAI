@@ -5,6 +5,7 @@ import { Heart, Copy, Check, Trash2, Clock, Languages } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
+import ScheduleButton from "@/components/generator/ScheduleButton";
 
 interface HistoryPost {
   id: string;
@@ -156,7 +157,7 @@ export default function HistoryPage() {
                     <p className="whitespace-pre-line text-sm leading-relaxed text-zinc-800">
                       {post.output}
                     </p>
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <Button
                         size="sm"
                         onClick={() => copyPost(post.id, post.output)}
@@ -170,6 +171,7 @@ export default function HistoryPage() {
                       >
                         {copiedId === post.id ? "Copied" : "Copy"}
                       </Button>
+                      <ScheduleButton postId={post.id} content={post.output} />
                       <button
                         onClick={() => deletePost(post.id)}
                         className="inline-flex items-center gap-1.5 rounded-md px-2 py-1.5 text-xs font-medium text-zinc-500 hover:bg-red-50 hover:text-red-700"

@@ -1,9 +1,10 @@
 "use client";
 
-import { signIn } from "next-auth/react";
+import { signIn, signOut } from "next-auth/react";
 import { useState } from "react";
 import Link from "next/link";
 import { Mail, ArrowRight, AlertCircle } from "lucide-react";
+import { LinkedInIcon } from "@/components/brand/LinkedInIcon";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Logo } from "@/components/brand/Logo";
@@ -28,8 +29,9 @@ export default function SignInForm({ callbackUrl, initialError }: SignInFormProp
   const [emailSent, setEmailSent] = useState(false);
   const [isSendingEmail, setIsSendingEmail] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [isLinkedInLoading, setIsLinkedInLoading] = useState(false);
   const [error, setError] = useState<string | null>(initialError || null);
-  const target = callbackUrl || "/onboarding";
+  const target = callbackUrl || "/app";
 
   async function handleEmail(e: React.FormEvent) {
     e.preventDefault();
@@ -104,8 +106,9 @@ export default function SignInForm({ callbackUrl, initialError }: SignInFormProp
                 size="lg"
                 fullWidth
                 loading={isGoogleLoading}
-                onClick={() => {
+                onClick={async () => {
                   setIsGoogleLoading(true);
+                  await signOut({ redirect: false });
                   signIn("google", { callbackUrl: target });
                 }}
                 leftIcon={
@@ -118,6 +121,22 @@ export default function SignInForm({ callbackUrl, initialError }: SignInFormProp
                 }
               >
                 Continue with Google
+              </Button>
+
+              <Button
+                type="button"
+                variant="outline"
+                size="lg"
+                fullWidth
+                loading={isLinkedInLoading}
+                onClick={async () => {
+                  setIsLinkedInLoading(true);
+                  await signOut({ redirect: false });
+                  signIn("linkedin", { callbackUrl: target });
+                }}
+                leftIcon={<LinkedInIcon className="h-5 w-5 text-[#0a66c2]" />}
+              >
+                Continue with LinkedIn
               </Button>
 
               <div className="relative py-2">

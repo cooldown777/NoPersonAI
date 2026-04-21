@@ -31,7 +31,7 @@ export default function StepDNAResult({
       <div>
         <h2 className="text-xl font-bold text-gray-900">Your Writing DNA</h2>
         <p className="mt-1 text-sm text-gray-600">
-          Here&apos;s how we understand your voice
+          Your voice, summarized
         </p>
       </div>
 

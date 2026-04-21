@@ -30,7 +30,7 @@ export async function generateDNAProfile(
   // Use the polish model — DNA is quality-critical and one-shot per user.
   const response = await anthropic.messages.create({
     model: MODELS.polish,
-    max_tokens: 500,
+    max_tokens: 150,
     messages: [{ role: "user", content: prompt }],
   });
 

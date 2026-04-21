@@ -2,6 +2,9 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Inter_Tight, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import Providers from "@/components/Providers";
+import MetaPixel from "@/components/analytics/MetaPixel";
+import { resolveLocale } from "@/i18n/server";
+import { getDictionary } from "@/i18n";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -64,17 +67,21 @@ export const viewport: Viewport = {
   maximumScale: 5,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const locale = await resolveLocale();
+  const dict = getDictionary(locale);
+
   return (
     <html
-      lang="en"
+      lang={locale}
       data-scroll-behavior="smooth"
       className={`${inter.variable} ${interTight.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-background font-sans text-foreground">
-        <Providers>{children}</Providers>
+        <MetaPixel />
+        <Providers locale={locale} dict={dict}>{children}</Providers>
       </body>
     </html>
   );
