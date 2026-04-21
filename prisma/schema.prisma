@@ -157,6 +157,12 @@ model User {
   billingCountry      String?
   billingVatId        String?
 
+  stripeCustomerId       String?   @unique
+  stripeSubscriptionId   String?   @unique
+  stripePriceId          String?
+  stripeStatus           String?
+  stripeCurrentPeriodEnd DateTime?
+
   accounts            Account[]
   sessions            Session[]
   writingDna          WritingDNA?

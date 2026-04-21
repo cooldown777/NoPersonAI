@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthUser, unauthorized } from "@/lib/auth-guard";
 import { prisma } from "@/lib/db";
+import { syncBillingToStripe } from "@/lib/stripe-customer";
 
 const FIELDS = [
   "billingName",
@@ -55,6 +56,10 @@ export async function PATCH(req: NextRequest) {
     data,
     select: FIELDS.reduce<Record<string, true>>((acc, f) => ({ ...acc, [f]: true }), {}),
   });
+
+  await syncBillingToStripe(user.id).catch((err) =>
+    console.warn("[billing] stripe sync failed", err),
+  );
 
   return NextResponse.json({ billing: row });
 }

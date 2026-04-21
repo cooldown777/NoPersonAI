@@ -66,6 +66,46 @@ export default function AccountClient({
     setBillingForm((prev) => ({ ...prev, [key]: value }));
   }
 
+  const [checkoutBusy, setCheckoutBusy] = useState<"month" | "year" | "portal" | null>(null);
+
+  async function startCheckout(interval: "month" | "year") {
+    setCheckoutBusy(interval);
+    try {
+      const res = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ interval }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        toast({ title: data.error || "Could not start checkout", variant: "error" });
+        setCheckoutBusy(null);
+      }
+    } catch {
+      toast({ title: "Could not start checkout", variant: "error" });
+      setCheckoutBusy(null);
+    }
+  }
+
+  async function openPortal() {
+    setCheckoutBusy("portal");
+    try {
+      const res = await fetch("/api/stripe/portal", { method: "POST" });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        toast({ title: data.error || "Could not open portal", variant: "error" });
+        setCheckoutBusy(null);
+      }
+    } catch {
+      toast({ title: "Could not open portal", variant: "error" });
+      setCheckoutBusy(null);
+    }
+  }
+
   async function saveBilling() {
     setSavingBilling(true);
     const res = await fetch("/api/billing", {
@@ -161,27 +201,89 @@ export default function AccountClient({
               </div>
               <div className="flex-1">
                 <div className="font-display text-base font-semibold text-zinc-900">
-                  Upgrade to Pro — €29/mo
+                  Upgrade to Pro
                 </div>
                 <p className="mt-1 text-sm text-zinc-600">
                   Unlimited posts, WhatsApp text &amp; voice notes, browser voice recording, priority speed.
                 </p>
-                <Button
-                  size="md"
-                  className="mt-4"
-                  leftIcon={<CreditCard className="h-4 w-4" />}
-                  rightIcon={<ArrowRight className="h-4 w-4" />}
-                  onClick={() =>
-                    trackEvent("InitiateCheckout", {
-                      value: 29,
-                      currency: "EUR",
-                      content_name: "pro_plan",
-                    })
-                  }
-                >
-                  Upgrade to Pro
-                </Button>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <Button
+                    size="md"
+                    onClick={() => {
+                      trackEvent("InitiateCheckout", {
+                        value: 29,
+                        currency: "EUR",
+                        content_name: "pro_monthly",
+                      });
+                      startCheckout("month");
+                    }}
+                    disabled={checkoutBusy !== null}
+                    leftIcon={
+                      checkoutBusy === "month" ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <CreditCard className="h-4 w-4" />
+                      )
+                    }
+                  >
+                    €29 / month
+                  </Button>
+                  <Button
+                    size="md"
+                    variant="outline"
+                    onClick={() => {
+                      trackEvent("InitiateCheckout", {
+                        value: 295.8,
+                        currency: "EUR",
+                        content_name: "pro_yearly",
+                      });
+                      startCheckout("year");
+                    }}
+                    disabled={checkoutBusy !== null}
+                    leftIcon={
+                      checkoutBusy === "year" ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : undefined
+                    }
+                    rightIcon={<ArrowRight className="h-4 w-4" />}
+                  >
+                    €295.80 / year · save 15%
+                  </Button>
+                </div>
               </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {isPro && (
+        <Card>
+          <CardContent className="p-5">
+            <div className="flex items-center gap-3">
+              <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-brand-100 text-brand-700">
+                <CreditCard className="h-5 w-5" />
+              </div>
+              <div className="flex-1">
+                <div className="font-display text-sm font-semibold text-zinc-900">
+                  Subscription
+                </div>
+                <div className="text-xs text-zinc-500">
+                  Manage your plan, payment method, and invoices
+                </div>
+              </div>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={openPortal}
+                disabled={checkoutBusy !== null}
+                leftIcon={
+                  checkoutBusy === "portal" ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : undefined
+                }
+              >
+                Manage
+              </Button>
             </div>
           </CardContent>
         </Card>
