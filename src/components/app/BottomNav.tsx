@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { PenSquare, Clock, Dna, User, MessageCircle, Layers } from "lucide-react";
+import { PenSquare, Clock, Dna, User, MessageCircle, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/brand/Logo";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
@@ -13,10 +13,10 @@ function useTabs() {
   return [
     { label: t("appShell.navCreate"), href: "/app", icon: PenSquare, match: (p: string) => p === "/app" },
     {
-      label: t("appShell.navBulk"),
-      href: "/app/bulk",
-      icon: Layers,
-      match: (p: string) => p.startsWith("/app/bulk"),
+      label: "Schedule",
+      href: "/app/schedule",
+      icon: Calendar,
+      match: (p: string) => p.startsWith("/app/schedule"),
     },
     {
       label: t("appShell.navWhatsApp"),

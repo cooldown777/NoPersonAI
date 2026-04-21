@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Inter_Tight, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import Providers from "@/components/Providers";
+import MetaPixel from "@/components/analytics/MetaPixel";
 import { resolveLocale } from "@/i18n/server";
 import { getDictionary } from "@/i18n";
 
@@ -79,6 +80,7 @@ export default async function RootLayout({
       className={`${inter.variable} ${interTight.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-background font-sans text-foreground">
+        <MetaPixel />
         <Providers locale={locale} dict={dict}>{children}</Providers>
       </body>
     </html>

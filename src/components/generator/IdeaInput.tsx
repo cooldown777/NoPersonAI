@@ -20,6 +20,7 @@ interface IdeaInputProps {
   isGenerating: boolean;
   disabled: boolean;
   isPro: boolean;
+  generateLabel?: string;
 }
 
 export default function IdeaInput({
@@ -29,6 +30,7 @@ export default function IdeaInput({
   isGenerating,
   disabled,
   isPro,
+  generateLabel = "Generate",
 }: IdeaInputProps) {
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
 
@@ -75,7 +77,7 @@ export default function IdeaInput({
           rightIcon={!isGenerating && <Send className="h-4 w-4" />}
           leftIcon={!isGenerating && <Sparkles className="h-4 w-4" />}
         >
-          Generate
+          {generateLabel}
         </Button>
       </div>
     </div>

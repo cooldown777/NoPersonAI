@@ -6,6 +6,10 @@
     "src/app/api/generate/route.ts": { "maxDuration": 60 },
     "src/app/api/generate/bulk/route.ts": { "maxDuration": 120 },
     "src/app/api/refine/route.ts": { "maxDuration": 60 },
-    "src/app/api/demo/route.ts": { "maxDuration": 60 }
-  }
+    "src/app/api/demo/route.ts": { "maxDuration": 60 },
+    "src/app/api/cron/publish-scheduled/route.ts": { "maxDuration": 60 }
+  },
+  "crons": [
+    { "path": "/api/cron/publish-scheduled", "schedule": "*/5 * * * *" }
+  ]
 }

@@ -9,6 +9,7 @@ import StepTone from "@/components/onboarding/StepTone";
 import StepStyle from "@/components/onboarding/StepStyle";
 import StepDNAResult from "@/components/onboarding/StepDNAResult";
 import { isLocale, type Locale } from "@/i18n/config";
+import { trackEvent } from "@/lib/analytics/meta-pixel";
 
 export default function OnboardingClient() {
   const { data: session } = useSession();
@@ -107,6 +108,7 @@ export default function OnboardingClient() {
   }
 
   function handleComplete() {
+    trackEvent("CompleteRegistration");
     router.push("/app");
   }
 

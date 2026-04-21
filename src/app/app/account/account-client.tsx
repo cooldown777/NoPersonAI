@@ -1,11 +1,23 @@
 "use client";
 
-import { signOut } from "next-auth/react";
+import { useState } from "react";
+import { signIn, signOut } from "next-auth/react";
 import Link from "next/link";
-import { LogOut, Sparkles, MessageCircle, ArrowRight, CreditCard } from "lucide-react";
+import {
+  LogOut,
+  Sparkles,
+  MessageCircle,
+  ArrowRight,
+  CreditCard,
+  CheckCircle2,
+  Loader2,
+} from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
+import { useToast } from "@/components/ui/Toast";
+import { LinkedInIcon } from "@/components/brand/LinkedInIcon";
+import { trackEvent } from "@/lib/analytics/meta-pixel";
 
 interface AccountClientProps {
   plan: "free" | "pro";
@@ -13,13 +25,36 @@ interface AccountClientProps {
   name: string;
   email: string;
   image?: string | null;
+  linkedInConnected: boolean;
 }
 
 const FREE_LIMIT = 5;
 
-export default function AccountClient({ plan, postsUsed, name, email, image }: AccountClientProps) {
+export default function AccountClient({
+  plan,
+  postsUsed,
+  name,
+  email,
+  image,
+  linkedInConnected,
+}: AccountClientProps) {
+  const { toast } = useToast();
   const isPro = plan === "pro";
   const pct = isPro ? 100 : Math.min(100, (postsUsed / FREE_LIMIT) * 100);
+  const [isDisconnecting, setIsDisconnecting] = useState(false);
+
+  async function handleLinkedInDisconnect() {
+    setIsDisconnecting(true);
+    try {
+      const res = await fetch("/api/linkedin/disconnect", { method: "POST" });
+      if (!res.ok) throw new Error("Failed");
+      toast({ title: "LinkedIn disconnected" });
+      setTimeout(() => window.location.reload(), 400);
+    } catch {
+      toast({ title: "Could not disconnect", variant: "error" });
+      setIsDisconnecting(false);
+    }
+  }
 
   return (
     <div className="space-y-5">
@@ -96,6 +131,13 @@ export default function AccountClient({ plan, postsUsed, name, email, image }: A
                   className="mt-4"
                   leftIcon={<CreditCard className="h-4 w-4" />}
                   rightIcon={<ArrowRight className="h-4 w-4" />}
+                  onClick={() =>
+                    trackEvent("InitiateCheckout", {
+                      value: 29,
+                      currency: "EUR",
+                      content_name: "pro_plan",
+                    })
+                  }
                 >
                   Upgrade to Pro
                 </Button>
@@ -104,6 +146,52 @@ export default function AccountClient({ plan, postsUsed, name, email, image }: A
           </CardContent>
         </Card>
       )}
+
+      <Card>
+        <CardContent className="p-5">
+          <div className="flex items-center gap-3">
+            <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#0a66c2]/10 text-[#0a66c2]">
+              <LinkedInIcon className="h-5 w-5" />
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <div className="font-display text-sm font-semibold text-zinc-900">
+                  LinkedIn
+                </div>
+                {linkedInConnected && (
+                  <Badge variant="success" className="gap-1">
+                    <CheckCircle2 className="h-3 w-3" />
+                    Connected
+                  </Badge>
+                )}
+              </div>
+              <div className="text-xs text-zinc-500">
+                {linkedInConnected
+                  ? "Schedule and publish posts directly"
+                  : "Connect to schedule and auto-post"}
+              </div>
+            </div>
+            {linkedInConnected ? (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleLinkedInDisconnect}
+                disabled={isDisconnecting}
+                leftIcon={isDisconnecting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : undefined}
+              >
+                Disconnect
+              </Button>
+            ) : (
+              <Button
+                size="sm"
+                onClick={() => signIn("linkedin", { callbackUrl: "/app/account" })}
+              >
+                Connect
+              </Button>
+            )}
+          </div>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardContent className="p-5">

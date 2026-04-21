@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { isLinkedInConnected } from "@/lib/linkedin";
 import AccountClient from "./account-client";
 
 export default async function AccountPage() {
@@ -13,6 +14,8 @@ export default async function AccountPage() {
     select: { plan: true, postsUsedThisMonth: true, postsResetAt: true },
   });
   if (!user) redirect("/auth/signin");
+
+  const linkedInConnected = await isLinkedInConnected(session.user.id);
 
   const now = new Date();
   const resetAt = new Date(user.postsResetAt);
@@ -28,6 +31,7 @@ export default async function AccountPage() {
       name={session.user.name || ""}
       email={session.user.email || ""}
       image={session.user.image || null}
+      linkedInConnected={linkedInConnected}
     />
   );
 }
