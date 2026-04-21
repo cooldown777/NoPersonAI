@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import {
@@ -22,7 +22,9 @@ import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { useToast } from "@/components/ui/Toast";
+import ScheduleButton from "@/components/generator/ScheduleButton";
 import { cn } from "@/lib/utils";
+import { Plus, Search } from "lucide-react";
 
 type Status = "pending" | "publishing" | "published" | "failed" | "cancelled";
 
@@ -78,6 +80,26 @@ export default function ScheduleClient({ linkedInConnected, initialSchedules }: 
     d.setDate(1);
     return d;
   });
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [posts, setPosts] = useState<{ id: string; output: string; createdAt: string }[]>([]);
+  const [postsLoading, setPostsLoading] = useState(false);
+  const [query, setQuery] = useState("");
+
+  useEffect(() => {
+    if (!pickerOpen || posts.length > 0) return;
+    setPostsLoading(true);
+    fetch("/api/posts")
+      .then((r) => r.json())
+      .then((d) => setPosts(d.posts ?? []))
+      .catch(() => setPosts([]))
+      .finally(() => setPostsLoading(false));
+  }, [pickerOpen, posts.length]);
+
+  const filteredPosts = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return posts;
+    return posts.filter((p) => p.output.toLowerCase().includes(q));
+  }, [posts, query]);
 
   async function cancel(id: string) {
     setBusyId(id);
@@ -225,6 +247,84 @@ export default function ScheduleClient({ linkedInConnected, initialSchedules }: 
                 </Button>
               </div>
             </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {linkedInConnected && (
+        <Card>
+          <CardContent className="p-4">
+            {!pickerOpen ? (
+              <Button
+                size="sm"
+                onClick={() => setPickerOpen(true)}
+                leftIcon={<Plus className="h-3.5 w-3.5" />}
+              >
+                Schedule a post
+              </Button>
+            ) : (
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <div className="font-display text-sm font-semibold text-zinc-900">
+                    Pick a post to schedule
+                  </div>
+                  <div className="flex-1" />
+                  <button
+                    onClick={() => setPickerOpen(false)}
+                    className="text-xs font-medium text-zinc-500 hover:text-zinc-900"
+                  >
+                    Close
+                  </button>
+                </div>
+
+                <div className="relative">
+                  <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400" />
+                  <input
+                    type="text"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder="Search your posts…"
+                    className="w-full rounded-xl border border-zinc-200 bg-white py-2 pl-9 pr-3 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30"
+                  />
+                </div>
+
+                {postsLoading ? (
+                  <div className="flex justify-center py-6">
+                    <Loader2 className="h-4 w-4 animate-spin text-zinc-400" />
+                  </div>
+                ) : filteredPosts.length === 0 ? (
+                  <div className="rounded-xl border border-dashed border-zinc-200 p-6 text-center text-sm text-zinc-500">
+                    {posts.length === 0 ? (
+                      <>
+                        No posts yet.{" "}
+                        <Link href="/app" className="font-medium text-brand-600 underline">
+                          Generate one
+                        </Link>
+                      </>
+                    ) : (
+                      "No matches."
+                    )}
+                  </div>
+                ) : (
+                  <div className="max-h-[420px] space-y-2 overflow-y-auto pr-1">
+                    {filteredPosts.map((p) => (
+                      <div
+                        key={p.id}
+                        className="rounded-xl border border-zinc-200 bg-white p-3"
+                      >
+                        <p className="line-clamp-2 text-sm text-zinc-800">{p.output}</p>
+                        <div className="mt-2 flex items-center justify-between">
+                          <span className="text-[11px] text-zinc-500">
+                            {new Date(p.createdAt).toLocaleDateString()}
+                          </span>
+                          <ScheduleButton postId={p.id} content={p.output} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
