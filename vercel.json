@@ -10,6 +10,6 @@
     "src/app/api/cron/publish-scheduled/route.ts": { "maxDuration": 60 }
   },
   "crons": [
-    { "path": "/api/cron/publish-scheduled", "schedule": "*/5 * * * *" }
+    { "path": "/api/cron/publish-scheduled", "schedule": "0 0 * * *" }
   ]
 }
