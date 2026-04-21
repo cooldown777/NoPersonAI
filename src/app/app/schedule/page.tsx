@@ -12,7 +12,7 @@ export default async function SchedulePage() {
   const [connected, schedules] = await Promise.all([
     isLinkedInConnected(session.user.id),
     prisma.scheduledPost.findMany({
-      where: { userId: session.user.id },
+      where: { userId: session.user.id, status: { not: "cancelled" } },
       orderBy: { scheduledFor: "asc" },
       take: 50,
     }),

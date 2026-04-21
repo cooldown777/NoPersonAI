@@ -126,9 +126,7 @@ export default function ScheduleClient({ linkedInConnected, initialSchedules }: 
     setBusyId(id);
     const res = await fetch(`/api/schedule/${id}`, { method: "DELETE" });
     if (res.ok) {
-      setSchedules((cur) =>
-        cur.map((s) => (s.id === id ? { ...s, status: "cancelled" } : s)),
-      );
+      setSchedules((cur) => cur.filter((s) => s.id !== id));
       toast({ title: "Cancelled" });
     } else {
       toast({ title: "Could not cancel", variant: "error" });
